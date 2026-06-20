@@ -12,7 +12,7 @@ Cette annexe présente les principales variables et structures de données utili
 | Variable | Type | Description |
 |---|---|---|
 | `HOME_URL` | `str` | URL de départ du site Books to Scrape. |
-| `CSV_HEADERS` | `list` | Liste des colonnes attendues dans le fichier CSV. |
+| `CSV_HEADERS` | `list` | Liste des colonnes attendues dans chaque fichier CSV. |
 | `LOGGER` | `logging.Logger` | Logger utilisé dans le module d'extraction. |
 
 ## Catégories
@@ -23,6 +23,7 @@ Cette annexe présente les principales variables et structures de données utili
 | `selected_categories` | `dict` | Dictionnaire contenant uniquement les catégories choisies. |
 | `category_name` | `str` | Nom d'une catégorie. |
 | `category_url` | `str` | URL complète d'une catégorie. |
+| `category_slug` | `str` | Nom technique propre utilisé pour le dossier et le CSV d'une catégorie. |
 | `categories_argument` | `str` ou `None` | Valeur reçue avec l'option `--categories`. |
 
 Structure de `categories` :
@@ -42,7 +43,8 @@ Structure de `categories` :
 | `book` | `dict` | Dictionnaire représentant un livre. |
 | `book_details` | `dict` | Données détaillées brutes extraites depuis la page produit. |
 | `transformed_book` | `dict` | Données transformées prêtes pour le CSV. |
-| `transformed_books` | `list` | Liste des livres transformés. |
+| `transformed_books` | `list` | Liste des livres transformés pour une catégorie. |
+| `books_by_category` | `dict` | Dictionnaire regroupant les livres transformés par catégorie. |
 
 Structure de base d'un livre trouvé dans une catégorie :
 
@@ -71,16 +73,36 @@ Structure d'un livre transformé :
 }
 ```
 
+Structure de `books_by_category` :
+
+```python
+{
+    "Classics": [book1, book2, book3],
+    "Philosophy": [book1, book2]
+}
+```
+
 ## Chemins de fichiers
 
 | Variable | Type | Description |
 |---|---|---|
-| `csv_path` | `Path` | Chemin du fichier CSV final. |
-| `csv_output_path` | `Path` | Chemin prévu pour le fichier CSV. |
-| `images_dir` | `Path` | Dossier des images pour une extraction. |
+| `export_dir` | `Path` | Dossier racine daté de l'extraction. |
+| `category_dir` | `Path` | Dossier d'une catégorie dans le dossier d'extraction. |
+| `csv_path` | `Path` | Chemin du fichier CSV d'une catégorie. |
+| `csv_paths` | `list` | Liste des fichiers CSV générés. |
+| `images_dir` | `Path` | Dossier `images/` d'une catégorie. |
 | `image_path` | `Path` | Chemin local d'une image. |
 | `log_file` | `Path` | Chemin du fichier log. |
 | `output_dir` | `str` ou `None` | Dossier de sortie fourni avec `--output`. |
+
+Structure de sortie :
+
+```text
+outputs/books_extraction_YYYYMMDD_HHMMSS/
+└── fantasy/
+    ├── fantasy.csv
+    └── images/
+```
 
 ## Résumés d'exécution
 
@@ -89,6 +111,7 @@ Structure d'un livre transformé :
 | `summary` | `dict` | Nombre de livres extraits par catégorie. |
 | `image_summary` | `dict` | Nombre d'images réussies ou en erreur. |
 | `count` | `int` | Nombre de livres traités pour une catégorie. |
+| `total_books` | `int` | Nombre total de livres extraits pendant l'exécution. |
 
 Structure de `summary` :
 
