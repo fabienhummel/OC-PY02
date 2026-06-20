@@ -22,7 +22,7 @@ Extract : récupération HTML et extraction des données
       ↓
 Transform : nettoyage et conversion
       ↓
-Load : CSV, images et logs
+Load : dossier d'export, CSV par catégorie, images et logs
 ```
 
 ## Correspondance avec les fichiers du projet
@@ -31,7 +31,7 @@ Load : CSV, images et logs
 |---|---|---|
 | Extract | `extract.py` | Récupère les catégories, les livres et les détails produits. |
 | Transform | `transform.py` | Nettoie les textes et convertit certaines valeurs. |
-| Load | `load.py` | Sauvegarde les données dans un CSV et prépare les images. |
+| Load | `load.py` | Prépare les dossiers de sortie, écrit les CSV et télécharge les images. |
 | Logs | `logger_config.py` | Configure le fichier log de l'exécution. |
 | Orchestration | `main.py` | Enchaîne les étapes et gère les options de lancement. |
 
@@ -76,15 +76,23 @@ La troisième étape sauvegarde les résultats.
 
 Le programme génère :
 
-- un fichier CSV ;
-- un dossier contenant les images ;
-- un fichier log.
+- un dossier d'extraction daté ;
+- un sous-dossier par catégorie ;
+- un fichier CSV par catégorie ;
+- un dossier `images/` dans chaque catégorie ;
+- un fichier log dans `logs/`.
 
 Exemple de sortie :
 
 ```text
-outputs/books_extraction_YYYYMMDD_HHMMSS.csv
-images/books_extraction_YYYYMMDD_HHMMSS/
+outputs/books_extraction_YYYYMMDD_HHMMSS/
+├── classics/
+│   ├── classics.csv
+│   └── images/
+└── philosophy/
+    ├── philosophy.csv
+    └── images/
+
 logs/extraction_YYYYMMDD_HHMMSS.log
 ```
 
@@ -94,8 +102,10 @@ Cette organisation permet de :
 
 - mieux comprendre le cheminement des données ;
 - séparer les responsabilités du code ;
+- obtenir un fichier CSV distinct pour chaque catégorie ;
+- regrouper les images avec la catégorie correspondante ;
+- faciliter la création du ZIP final ;
 - faciliter la maintenance ;
-- faciliter les tests futurs ;
 - préparer une éventuelle évolution vers un traitement plus automatisé.
 
 ## Évolutions possibles
@@ -113,7 +123,7 @@ Le pipeline pourrait être enrichi avec :
 L'application établit un pipeline ETL simple :
 
 ```text
-Site web → extraction → transformation → sauvegarde CSV et images
+Site web → extraction → transformation → sauvegarde par catégorie
 ```
 
-Cette structure répond au besoin initial tout en préparant de futures évolutions.
+Chaque catégorie produit son propre CSV et son propre dossier d'images, ce qui répond plus directement au besoin de livrable demandé.
