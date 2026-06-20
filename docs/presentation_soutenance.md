@@ -12,7 +12,7 @@ Books Online souhaite automatiser le suivi des prix de livres d'occasion chez un
 
 Le travail manuel étant trop long, l'objectif est de développer une première version bêta d'un scraper Python capable de récupérer les informations produits au moment de son exécution.
 
-**Objectif principal :** produire automatiquement des données exploitables sous forme de fichier CSV, avec les images associées.
+**Objectif principal :** produire automatiquement des données exploitables sous forme de fichiers CSV, avec les images associées.
 
 ---
 
@@ -23,8 +23,8 @@ L'application permet de :
 - récupérer les catégories disponibles sur Books to Scrape ;
 - extraire les informations détaillées des livres ;
 - transformer certaines données pour les rendre exploitables ;
-- générer un fichier CSV ;
-- télécharger les images des livres ;
+- générer un fichier CSV distinct par catégorie ;
+- télécharger les images des livres dans le dossier de leur catégorie ;
 - tracer les actions et erreurs dans un fichier log.
 
 ---
@@ -92,14 +92,14 @@ OC-PY02/
 
 ## 6. Architecture générale
 
-Le programme est organisé autour de quatre rôles principaux :
+Le programme est organisé autour de cinq rôles principaux :
 
 | Fichier | Rôle |
 |---|---|
 | `main.py` | Point d'entrée et orchestration |
 | `extract.py` | Extraction des données depuis le HTML |
 | `transform.py` | Nettoyage et conversion des données |
-| `load.py` | Sauvegarde CSV et téléchargement des images |
+| `load.py` | Organisation des exports, CSV et images |
 | `logger_config.py` | Configuration des logs |
 
 Cette organisation permet de séparer clairement les responsabilités du code.
@@ -114,7 +114,7 @@ Le projet suit une logique ETL :
 |---|---|
 | Extract | Récupérer les pages HTML et les données brutes |
 | Transform | Nettoyer et convertir les données utiles |
-| Load | Sauvegarder les données et les images localement |
+| Load | Sauvegarder les données par catégorie et les images associées |
 
 **Message clé :** le programme ne se limite pas à scraper une page ; il structure le processus de collecte sous forme de pipeline.
 
@@ -164,17 +164,24 @@ src/books_scraper/transform.py
 
 La partie chargement permet de :
 
-- générer un fichier CSV daté ;
-- créer un dossier images associé à l'extraction ;
-- télécharger les images avec un nom explicite ;
+- créer un dossier d'extraction daté ;
+- créer un sous-dossier par catégorie ;
+- générer un fichier CSV par catégorie ;
+- créer un dossier `images/` pour chaque catégorie ;
 - produire un fichier log pour tracer l'exécution.
 
 Exemple de sortie :
 
 ```text
-outputs/books_extraction_20260620_183000.csv
-images/books_extraction_20260620_183000/
-logs/extraction_20260620_183000.log
+outputs/books_extraction_20260621_143000/
+├── classics/
+│   ├── classics.csv
+│   └── images/
+└── philosophy/
+    ├── philosophy.csv
+    └── images/
+
+logs/extraction_20260621_143000.log
 ```
 
 ---
@@ -231,7 +238,7 @@ Afficher le détail d'un livre :
 python src/main.py --detail "A Light in the Attic"
 ```
 
-Lancer une extraction :
+Lancer une extraction sur deux catégories :
 
 ```bash
 python src/main.py --extract --categories "Classics,Philosophy"
@@ -288,9 +295,10 @@ Plan de démonstration :
 3. afficher les livres d'une catégorie ;
 4. afficher le détail d'un livre ;
 5. lancer une extraction sur une ou deux catégories ;
-6. montrer le CSV généré ;
-7. montrer le dossier images ;
-8. montrer le fichier log.
+6. montrer le dossier d'extraction généré ;
+7. montrer un CSV par catégorie ;
+8. montrer le dossier `images/` de chaque catégorie ;
+9. montrer le fichier log.
 
 ---
 
@@ -299,7 +307,6 @@ Plan de démonstration :
 Idées d'améliorations possibles :
 
 - ajout de tests automatisés ;
-- export d'un fichier CSV par catégorie ;
 - planification automatique de l'extraction ;
 - stockage des données dans une base de données ;
 - comparaison des prix dans le temps ;
@@ -324,7 +331,7 @@ Les fichiers CSV, les images et les logs sont des fichiers générés. Ils ne do
 
 ### Comment le programme illustre-t-il un pipeline ETL ?
 
-Il extrait les données du site, les transforme pour les rendre exploitables, puis les charge dans un fichier CSV avec les images associées.
+Il extrait les données du site, les transforme pour les rendre exploitables, puis les charge dans des dossiers organisés par catégorie avec un CSV et les images associées.
 
 ---
 
@@ -342,4 +349,4 @@ Il démontre :
 - la compréhension du processus ETL.
 
 **Phrase de conclusion :**  
-L'application constitue une première version fonctionnelle d'un outil de collecte automatisée, qui pourrait être enrichi ensuite pour suivre les prix dans le temps.
+L'application constitue une première version fonctionnelle d'un outil de collecte automatisée, avec une restitution organisée par catégorie pour faciliter l'exploitation des données.
