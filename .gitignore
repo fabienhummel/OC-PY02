@@ -238,3 +238,6 @@ images/*
 **/*.jpeg
 **/*.png
 **/*.webp
+
+# IDE settings
+.idea/
