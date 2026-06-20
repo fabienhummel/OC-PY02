@@ -77,9 +77,11 @@ def parse_arguments():
     parser.add_argument(
         "--detail",
         action="append",
+        nargs="+",
+        metavar="TITLE",
         help=(
             "Titre exact d'un livre à détailler. "
-            "Option répétable pour plusieurs livres."
+            "Plusieurs titres peuvent être indiqués après --detail."
         ),
     )
 
@@ -465,7 +467,8 @@ def run_cli_mode(args, categories, logger, log_file):
         return
 
     if args.detail:
-        show_details(categories, args.detail, args.categories, logger)
+        detail_titles = [title for group in args.detail for title in group]
+        show_details(categories, detail_titles, args.categories, logger)
         return
 
     if args.extract:
