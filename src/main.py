@@ -11,8 +11,6 @@ Modes disponibles :
 
 import argparse
 import sys
-from datetime import datetime
-from pathlib import Path
 
 import questionary
 from tqdm import tqdm
@@ -25,8 +23,10 @@ from books_scraper.extract import (
 from books_scraper.load import (
     build_image_file_name,
     download_image,
-    get_default_csv_path,
-    get_images_dir_from_csv_path,
+    get_category_csv_path,
+    get_category_dir,
+    get_category_images_dir,
+    get_default_export_dir,
     save_books_to_csv,
 )
 from books_scraper.logger_config import setup_logger
@@ -64,7 +64,7 @@ def parse_arguments():
 
     parser.add_argument(
         "--output",
-        help="Dossier de sortie du CSV et du dossier images.",
+        help="Dossier de sortie du dossier d'export.",
     )
 
     parser.add_argument(
@@ -199,20 +199,12 @@ def resolve_categories(
     return selected_categories
 
 
-def build_output_paths(output_dir=None):
-    """Construit le chemin du CSV et le dossier images."""
-    if output_dir:
-        output_path = Path(output_dir)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        csv_path = output_path / f"books_extraction_{timestamp}.csv"
-        images_dir = output_path / "images" / csv_path.stem
+def build_export_dir(output_dir=None):
+    """Construit le dossier racine de l'extraction."""
+    export_dir = get_default_export_dir(output_dir)
+    export_dir.mkdir(parents=True, exist_ok=True)
 
-        return csv_path, images_dir
-
-    csv_path = get_default_csv_path()
-    images_dir = get_images_dir_from_csv_path(csv_path)
-
-    return csv_path, images_dir
+    return export_dir
 
 
 def print_if_not_quiet(message="", quiet=False):
@@ -315,9 +307,9 @@ def show_details(categories, titles, categories_argument, logger):
             print(f"Livre non trouvé : {requested_title}")
 
 
-def extract_books(selected_categories, images_dir, logger, quiet=False):
-    """Extrait les données, transforme les livres et télécharge les images."""
-    transformed_books = []
+def extract_books(selected_categories, export_dir, logger, quiet=False):
+    """Extrait les données et les images, catégorie par catégorie."""
+    books_by_category = {}
     summary = {}
     image_summary = {
         "downloaded": 0,
@@ -331,6 +323,9 @@ def extract_books(selected_categories, images_dir, logger, quiet=False):
         )
         logger.info("Début catégorie : %s", category_name)
 
+        category_dir = get_category_dir(export_dir, category_name)
+        images_dir = get_category_images_dir(category_dir)
+
         try:
             book_links = extract_book_links_from_category(
                 category_name,
@@ -339,9 +334,11 @@ def extract_books(selected_categories, images_dir, logger, quiet=False):
         except Exception as error:
             print_if_not_quiet(f"Catégorie ignorée : {category_name}", quiet)
             logger.exception("Erreur catégorie %s : %s", category_name, error)
+            books_by_category[category_name] = []
             summary[category_name] = 0
             continue
 
+        transformed_books = []
         count = 0
 
         for book in tqdm(
@@ -376,11 +373,12 @@ def extract_books(selected_categories, images_dir, logger, quiet=False):
                     error,
                 )
 
+        books_by_category[category_name] = transformed_books
         summary[category_name] = count
         print_if_not_quiet(f"Terminé : {count} livres extraits", quiet)
         print_if_not_quiet("-" * 80, quiet)
 
-    return transformed_books, summary, image_summary
+    return books_by_category, summary, image_summary
 
 
 def print_summary(summary, total):
@@ -397,6 +395,24 @@ def print_summary(summary, total):
     print()
 
 
+def save_category_csv_files(books_by_category, export_dir, logger):
+    """Sauvegarde un fichier CSV par catégorie."""
+    csv_paths = []
+
+    for category_name, books in books_by_category.items():
+        if not books:
+            continue
+
+        category_dir = get_category_dir(export_dir, category_name)
+        csv_path = get_category_csv_path(category_dir, category_name)
+        saved_csv_path = save_books_to_csv(books, csv_path)
+
+        csv_paths.append(saved_csv_path)
+        logger.info("Fichier CSV généré pour %s : %s", category_name, saved_csv_path)
+
+    return csv_paths
+
+
 def run_extraction(selected_categories, output_dir, logger, log_file, quiet=False):
     """Lance l'extraction et sauvegarde les résultats."""
     if not selected_categories:
@@ -407,19 +423,21 @@ def run_extraction(selected_categories, output_dir, logger, log_file, quiet=Fals
         logger.warning("Aucune catégorie sélectionnée")
         return
 
-    csv_path, images_dir = build_output_paths(output_dir)
+    export_dir = build_export_dir(output_dir)
 
-    books, summary, image_summary = extract_books(
+    books_by_category, summary, image_summary = extract_books(
         selected_categories,
-        images_dir,
+        export_dir,
         logger,
         quiet=quiet,
     )
 
-    if not quiet:
-        print_summary(summary, len(books))
+    total_books = sum(len(books) for books in books_by_category.values())
 
-    if not books:
+    if not quiet:
+        print_summary(summary, total_books)
+
+    if not total_books:
         print_if_not_quiet(
             "Aucun livre extrait. Aucun fichier CSV généré.",
             quiet,
@@ -428,13 +446,21 @@ def run_extraction(selected_categories, output_dir, logger, log_file, quiet=Fals
         return
 
     try:
-        saved_csv_path = save_books_to_csv(books, csv_path)
+        csv_paths = save_category_csv_files(
+            books_by_category,
+            export_dir,
+            logger,
+        )
 
         if not quiet:
             print()
             print("Sauvegarde terminée.")
-            print(f"Fichier CSV généré : {saved_csv_path}")
-            print(f"Dossier images généré : {images_dir}")
+            print(f"Dossier d'export généré : {export_dir}")
+            print(f"CSV générés : {len(csv_paths)}")
+
+            for csv_path in csv_paths:
+                print(f"- {csv_path}")
+
             print(
                 "Images téléchargées : "
                 f"{image_summary['downloaded']} réussies, "
@@ -442,8 +468,8 @@ def run_extraction(selected_categories, output_dir, logger, log_file, quiet=Fals
             )
             print(f"Fichier log généré : {log_file}")
 
-        logger.info("Fichier CSV généré : %s", saved_csv_path)
-        logger.info("Dossier images généré : %s", images_dir)
+        logger.info("Dossier d'export généré : %s", export_dir)
+        logger.info("Nombre de fichiers CSV générés : %s", len(csv_paths))
         logger.info(
             "Images téléchargées : %s réussies, %s en erreur",
             image_summary["downloaded"],
