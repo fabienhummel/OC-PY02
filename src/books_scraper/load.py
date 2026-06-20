@@ -52,34 +52,6 @@ def get_default_csv_path():
     return current_path / "outputs" / file_name
 
 
-def ask_csv_output_path():
-    """
-    Propose un chemin de sauvegarde CSV à l'utilisateur.
-
-    L'utilisateur peut :
-    - appuyer sur Entrée pour accepter le chemin proposé ;
-    - saisir un autre chemin s'il souhaite un emplacement différent.
-
-    Returns:
-        Path: Chemin du fichier CSV à créer.
-    """
-    default_path = get_default_csv_path()
-
-    print()
-    print("Chemin de sauvegarde CSV proposé :")
-    print(default_path)
-
-    user_path = input(
-        "Appuie sur Entrée pour accepter, "
-        "ou saisis un autre chemin de fichier CSV : "
-    ).strip()
-
-    if user_path:
-        return Path(user_path)
-
-    return default_path
-
-
 def save_books_to_csv(books, csv_file_path):
     """
     Sauvegarde une liste de livres dans un fichier CSV.
@@ -186,50 +158,3 @@ def download_image(image_url, image_path):
         image_file.write(response.content)
 
     return True
-
-
-def download_books_images(books, csv_file_path, logger=None):
-    """
-    Télécharge les images des livres dans un dossier dédié à l'extraction.
-
-    Le dossier images est créé à partir du nom du fichier CSV.
-
-    Args:
-        books (list): Liste de dictionnaires contenant les données des livres.
-        csv_file_path (Path): Chemin du fichier CSV généré.
-        logger (logging.Logger | None): Logger optionnel pour tracer les erreurs.
-
-    Returns:
-        dict: Résumé du téléchargement des images.
-    """
-    images_dir = get_images_dir_from_csv_path(csv_file_path)
-
-    downloaded_count = 0
-    failed_count = 0
-
-    for book in books:
-        image_url = book.get("image_url", "")
-        image_file_name = build_image_file_name(book)
-        image_file_path = images_dir / image_file_name
-
-        try:
-            if download_image(image_url, image_file_path):
-                downloaded_count += 1
-            else:
-                failed_count += 1
-
-        except (requests.RequestException, OSError) as error:
-            failed_count += 1
-
-            if logger:
-                logger.exception(
-                    "Erreur lors du téléchargement de l'image %s : %s",
-                    image_url,
-                    error,
-                )
-
-    return {
-        "images_dir": images_dir,
-        "downloaded": downloaded_count,
-        "failed": failed_count,
-    }
