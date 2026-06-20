@@ -81,17 +81,25 @@ python src/main.py --list books --categories "Fantasy,Travel"
 
 ## Afficher le détail d'un livre
 
+Afficher un seul livre :
+
 ```bash
 python src/main.py --detail "A Light in the Attic"
 ```
 
-Afficher le détail de plusieurs livres :
+Afficher plusieurs livres :
+
+```bash
+python src/main.py --detail "A Light in the Attic" "Soulless"
+```
+
+Les titres contenant des virgules restent correctement gérés s'ils sont placés entre guillemets.
+
+L'ancienne syntaxe reste compatible :
 
 ```bash
 python src/main.py --detail "A Light in the Attic" --detail "Soulless"
 ```
-
-L'option `--detail` peut être répétée. Cela permet de gérer correctement les titres contenant une virgule.
 
 ## Lancer une extraction
 
