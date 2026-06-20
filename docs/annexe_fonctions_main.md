@@ -11,7 +11,7 @@
 
 | Fonction | Utilité |
 |---|---|
-| `parse_arguments()` | Définit les options disponibles en ligne de commande. |
+| `parse_arguments()` | Définit les options disponibles en ligne de commande, dont `--detail` qui accepte un ou plusieurs titres. |
 | `validate_arguments(parser, args)` | Vérifie que les combinaisons d'options sont cohérentes. |
 | `choose_interactive_categories(categories)` | Affiche le menu interactif de sélection des catégories. |
 | `resolve_categories(categories, categories_argument, default_all=False, logger=None, quiet=False)` | Transforme l'argument `--categories` en dictionnaire de catégories à traiter. |
@@ -24,7 +24,7 @@
 | `extract_books(selected_categories, images_dir, logger, quiet=False)` | Extrait les livres, transforme les données et télécharge les images. |
 | `print_summary(summary, total)` | Affiche le résumé de l'extraction. |
 | `run_extraction(selected_categories, output_dir, logger, log_file, quiet=False)` | Lance une extraction complète et sauvegarde les fichiers. |
-| `run_cli_mode(args, categories, logger, log_file)` | Lance le mode ligne de commande. |
+| `run_cli_mode(args, categories, logger, log_file)` | Lance le mode ligne de commande et prépare la liste des titres demandés avec `--detail`. |
 | `run_interactive_mode(categories, logger, log_file)` | Lance le mode interactif. |
 | `main()` | Configure le programme et lance le mode adapté. |
 
@@ -34,3 +34,4 @@
 - Il coordonne les modules `extract`, `transform`, `load` et `logger_config`.
 - Il gère les modes interactif et non interactif.
 - Il applique le mode `--quiet` pour limiter les sorties terminal pendant l'extraction.
+- L'option `--detail` accepte désormais plusieurs titres après une seule option, par exemple `--detail "Titre 1" "Titre 2"`.
