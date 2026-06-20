@@ -121,13 +121,15 @@ Extraire plusieurs catégories :
 python src/main.py --extract --categories "Classics,Philosophy"
 ```
 
+Une extraction crée un dossier daté contenant un sous-dossier par catégorie.
+
 ## Choisir un dossier de sortie
 
 ```bash
 python src/main.py --extract --categories "Classics,Philosophy" --output "./exports"
 ```
 
-Cette commande génère le fichier CSV dans le dossier indiqué.
+Cette commande crée le dossier d'extraction dans `exports/` au lieu de `outputs/`.
 
 ## Utiliser le mode silencieux
 
@@ -142,9 +144,24 @@ Le mode silencieux limite les sorties dans le terminal. Les informations restent
 Lors d'une extraction, le programme peut générer :
 
 ```text
-outputs/books_extraction_YYYYMMDD_HHMMSS.csv
-images/books_extraction_YYYYMMDD_HHMMSS/
+outputs/books_extraction_YYYYMMDD_HHMMSS/
+├── classics/
+│   ├── classics.csv
+│   └── images/
+└── philosophy/
+    ├── philosophy.csv
+    └── images/
+
 logs/extraction_YYYYMMDD_HHMMSS.log
+```
+
+Avec `--output "./exports"`, la structure est identique mais créée dans `exports/` :
+
+```text
+exports/books_extraction_YYYYMMDD_HHMMSS/
+└── fantasy/
+    ├── fantasy.csv
+    └── images/
 ```
 
 ## Commande de démonstration recommandée
@@ -155,4 +172,4 @@ Pour la soutenance, une commande courte et lisible peut être utilisée :
 python src/main.py --extract --categories "Classics,Philosophy"
 ```
 
-Elle permet de montrer le fonctionnement complet sans extraire toutes les catégories.
+Elle permet de montrer le fonctionnement complet, avec un CSV par catégorie et les images associées dans chaque dossier de catégorie.
