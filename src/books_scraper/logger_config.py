@@ -20,7 +20,7 @@ def setup_logger():
     la date et l'heure de lancement du programme.
 
     Returns:
-        logging.Logger: Logger configuré pour le projet.
+        tuple: Logger configuré pour le projet et chemin du fichier de log.
     """
     logs_dir = Path.cwd() / "logs"
     logs_dir.mkdir(parents=True, exist_ok=True)
