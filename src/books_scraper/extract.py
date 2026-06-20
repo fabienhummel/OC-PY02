@@ -151,6 +151,7 @@ def extract_book_links_from_category(category_name, category_url):
     Cette fonction récupère seulement les informations nécessaires pour aller
     ensuite consulter chaque page détail :
     - la catégorie ;
+    - le titre du livre ;
     - l'URL de la page produit.
 
     Args:
@@ -158,7 +159,7 @@ def extract_book_links_from_category(category_name, category_url):
         category_url (str): URL de la première page de catégorie.
 
     Returns:
-        list: Liste de dictionnaires contenant category et product_page_url.
+        list: Liste de dictionnaires contenant category, title et product_page_url.
     """
     books = []
     nb_page_categories = extract_number_of_pages(category_url)
@@ -176,10 +177,12 @@ def extract_book_links_from_category(category_name, category_url):
             if product_link:
                 product_relative_url = product_link.get("href", "")
                 product_page_url = urljoin(page_url, product_relative_url)
+                title = product_link.get("title", "")
 
                 books.append(
                     {
                         "category": category_name,
+                        "title": title,
                         "product_page_url": product_page_url,
                     }
                 )
@@ -343,7 +346,7 @@ def extract_book_details(book):
     if title_tag:
         title = title_tag.get_text(strip=True)
     else:
-        title = ""
+        title = book.get("title", "")
 
     product_details = {
         "product_page_url": product_page_url,
