@@ -216,3 +216,25 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+.DS_Store
+
+# OpenClassrooms - Projet 2 - generated scraping data
+data/*
+outputs/*
+images/*
+
+# Keep empty folders with .gitkeep
+!data/raw/
+!data/raw/.gitkeep
+!data/processed/
+!data/processed/.gitkeep
+!outputs/.gitkeep
+!images/.gitkeep
+
+# Ignore generated files
+*.csv
+**/*.csv
+**/*.jpg
+**/*.jpeg
+**/*.png
+**/*.webp
