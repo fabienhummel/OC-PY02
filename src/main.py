@@ -4,7 +4,7 @@ Point d'entrée du programme Books to Scrape.
 Ce fichier orchestre le processus ETL :
 - Extract : récupération des catégories et extraction des livres ;
 - Transform : nettoyage et conversion des données ;
-- Load : sauvegarde des données dans un fichier CSV.
+- Load : sauvegarde des données dans un fichier CSV et téléchargement des images.
 
 Navigation dans les menus :
 - flèches haut / bas pour naviguer ;
@@ -20,7 +20,11 @@ from books_scraper.extract import (
     extract_book_links_from_category,
     extract_categories,
 )
-from books_scraper.load import ask_csv_output_path, save_books_to_csv
+from books_scraper.load import (
+    ask_csv_output_path,
+    download_books_images,
+    save_books_to_csv,
+)
 from books_scraper.logger_config import setup_logger
 from books_scraper.transform import transform_books
 
@@ -213,6 +217,7 @@ def main():
     - extrait les livres détaillés des catégories choisies ;
     - transforme les données extraites ;
     - sauvegarde les résultats dans un fichier CSV ;
+    - télécharge les images des livres ;
     - affiche un résumé de l'extraction.
     """
     logger, log_file = setup_logger()
@@ -259,17 +264,35 @@ def main():
         csv_output_path = ask_csv_output_path()
         saved_csv_path = save_books_to_csv(transformed_books, csv_output_path)
 
+        images_summary = download_books_images(
+            transformed_books,
+            saved_csv_path,
+            logger=logger,
+        )
+
         print()
         print("Sauvegarde terminée.")
         print(f"Fichier CSV généré : {saved_csv_path}")
+        print(f"Dossier images généré : {images_summary['images_dir']}")
+        print(
+            "Images téléchargées : "
+            f"{images_summary['downloaded']} réussies, "
+            f"{images_summary['failed']} en erreur"
+        )
         print(f"Fichier log généré : {log_file}")
 
         logger.info("Fichier CSV généré : %s", saved_csv_path)
+        logger.info("Dossier images généré : %s", images_summary["images_dir"])
+        logger.info(
+            "Images téléchargées : %s réussies, %s en erreur",
+            images_summary["downloaded"],
+            images_summary["failed"],
+        )
 
     except Exception as error:
-        print("Erreur lors de la sauvegarde du fichier CSV.")
+        print("Erreur lors de la sauvegarde des données.")
         print("Voir le fichier log pour le détail.")
-        logger.exception("Erreur lors de la sauvegarde CSV : %s", error)
+        logger.exception("Erreur lors de la sauvegarde des données : %s", error)
 
 
 if __name__ == "__main__":
