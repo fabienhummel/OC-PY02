@@ -1,19 +1,21 @@
-"""
-Point d'entrée du programme Books to Scrape.
+"""Point d'entrée du programme Books to Scrape.
 
-Ce fichier orchestre le processus ETL :
-- Extract : récupération des catégories et extraction des livres ;
-- Transform : nettoyage et conversion des données ;
-- Load : sauvegarde des données dans un fichier CSV et téléchargement des images.
-
-Navigation dans les menus :
-- flèches haut / bas pour naviguer ;
-- espace pour cocher dans le second menu ;
-- entrée pour valider.
+Modes disponibles :
+- sans option : affiche l'aide ;
+- --interactive : lance le mode interactif ;
+- --extract : lance une extraction non interactive ;
+- --list categories : affiche les catégories ;
+- --list books : affiche les titres des livres ;
+- --detail : affiche les détails d'un ou plusieurs livres.
 """
 
-import questionary  # Permet de créer des menus interactifs dans le terminal.
-from tqdm import tqdm  # Permet d'afficher une barre de progression.
+import argparse
+import sys
+from datetime import datetime
+from pathlib import Path
+
+import questionary
+from tqdm import tqdm
 
 from books_scraper.extract import (
     extract_book_details,
@@ -34,18 +36,103 @@ from books_scraper.transform import transform_book
 HOME_URL = "https://books.toscrape.com/index.html"
 
 
-def choose_extraction_mode():
-    """
-    Affiche le premier menu de choix.
+def parse_arguments():
+    """Analyse les options passées au lancement du programme."""
+    parser = argparse.ArgumentParser(
+        description="Scraper Books to Scrape."
+    )
 
-    L'utilisateur choisit entre :
-    - traiter toutes les catégories ;
-    - sélectionner manuellement certaines catégories.
+    parser.add_argument(
+        "--interactive",
+        action="store_true",
+        help="Lance le mode interactif.",
+    )
 
-    Returns:
-        str: Mode choisi par l'utilisateur.
-    """
-    return questionary.select(
+    parser.add_argument(
+        "--extract",
+        action="store_true",
+        help="Lance une extraction non interactive.",
+    )
+
+    parser.add_argument(
+        "--categories",
+        help=(
+            "Catégories séparées par des virgules, "
+            "ou all pour toutes les catégories."
+        ),
+    )
+
+    parser.add_argument(
+        "--output",
+        help="Dossier de sortie du CSV et du dossier images.",
+    )
+
+    parser.add_argument(
+        "--list",
+        choices=["categories", "books"],
+        dest="list_mode",
+        help="Liste les catégories ou les titres des livres.",
+    )
+
+    parser.add_argument(
+        "--detail",
+        action="append",
+        help=(
+            "Titre exact d'un livre à détailler. "
+            "Option répétable pour plusieurs livres."
+        ),
+    )
+
+    parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="N'affiche aucune sortie terminal pendant une extraction.",
+    )
+
+    return parser
+
+
+def validate_arguments(parser, args):
+    """Valide les combinaisons d'options autorisées."""
+    selected_modes = [
+        args.interactive,
+        args.extract,
+        args.list_mode is not None,
+        args.detail is not None,
+    ]
+
+    if sum(bool(mode) for mode in selected_modes) > 1:
+        parser.error(
+            "Choisis un seul mode : --interactive, --extract, --list ou --detail."
+        )
+
+    if args.quiet and not args.extract:
+        parser.error("--quiet ne peut être utilisé qu'avec --extract.")
+
+    if args.output and not args.extract:
+        parser.error("--output ne peut être utilisé qu'avec --extract.")
+
+    if args.extract and not args.categories:
+        parser.error("--extract nécessite --categories.")
+
+    if args.list_mode == "books" and not args.categories:
+        parser.error("--list books nécessite --categories.")
+
+    if args.list_mode == "categories" and args.categories:
+        parser.error("--categories n'est pas utile avec --list categories.")
+
+    if args.categories and not (
+        args.extract or args.list_mode == "books" or args.detail
+    ):
+        parser.error(
+            "--categories doit être utilisé avec --extract, --list books "
+            "ou --detail."
+        )
+
+
+def choose_interactive_categories(categories):
+    """Sélectionne les catégories en mode interactif."""
+    mode = questionary.select(
         "Que veux-tu extraire ?",
         choices=[
             "Toutes les catégories",
@@ -53,200 +140,364 @@ def choose_extraction_mode():
         ],
     ).ask()
 
+    if mode == "Toutes les catégories":
+        return categories
 
-def select_categories(categories):
-    """
-    Affiche un menu à cases à cocher pour sélectionner les catégories.
-
-    Args:
-        categories (dict): Dictionnaire des catégories disponibles.
-
-    Returns:
-        dict: Dictionnaire contenant uniquement les catégories sélectionnées.
-    """
-    selected_choices = questionary.checkbox(
+    selected_names = questionary.checkbox(
         "Choisis les catégories à traiter :",
         choices=list(categories.keys()),
         instruction=(
-            "Utilise les flèches pour naviguer, espace pour cocher, "
+            "flèches pour naviguer, espace pour cocher, "
             "entrée pour valider"
         ),
     ).ask()
 
-    if not selected_choices:
+    if not selected_names:
         return {}
+
+    return {name: categories[name] for name in selected_names}
+
+
+def resolve_categories(categories, categories_argument, default_all=False):
+    """Résout l'argument --categories en dictionnaire de catégories."""
+    if not categories_argument:
+        if default_all:
+            return categories
+
+        return {}
+
+    if categories_argument.casefold() == "all":
+        return categories
 
     selected_categories = {}
 
-    for category_name in selected_choices:
-        selected_categories[category_name] = categories[category_name]
+    for requested_name in categories_argument.split(","):
+        requested_name = requested_name.strip()
+        found = False
+
+        for category_name, category_url in categories.items():
+            if category_name.casefold() == requested_name.casefold():
+                selected_categories[category_name] = category_url
+                found = True
+                break
+
+        if not found:
+            print(f"Catégorie inconnue : {requested_name}")
 
     return selected_categories
 
 
-def get_categories_to_process(categories):
-    """
-    Détermine les catégories à traiter selon le choix utilisateur.
+def build_output_paths(output_dir=None):
+    """Construit le chemin du CSV et le dossier images."""
+    if output_dir:
+        output_path = Path(output_dir)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        csv_path = output_path / f"books_extraction_{timestamp}.csv"
+        images_dir = output_path / "images" / csv_path.stem
 
-    Args:
-        categories (dict): Dictionnaire de toutes les catégories disponibles.
+        return csv_path, images_dir
 
-    Returns:
-        dict: Dictionnaire des catégories à traiter.
-    """
-    extraction_mode = choose_extraction_mode()
+    csv_path = get_default_csv_path()
+    images_dir = get_images_dir_from_csv_path(csv_path)
 
-    if extraction_mode == "Toutes les catégories":
-        return categories
-
-    if extraction_mode == "Sélection de catégories":
-        return select_categories(categories)
-
-    return {}
+    return csv_path, images_dir
 
 
-def extract_selected_categories(selected_categories, images_dir, logger):
-    """
-    Extrait les livres détaillés des catégories sélectionnées.
+def print_if_not_quiet(message="", quiet=False):
+    """Affiche un message uniquement si le mode quiet est désactivé."""
+    if not quiet:
+        print(message)
 
-    Les images sont téléchargées pendant l'extraction de chaque livre afin que
-    la barre de progression reflète à la fois l'extraction des données et la
-    sauvegarde de l'image associée.
 
-    Les erreurs sont capturées catégorie par catégorie et livre par livre.
-    Une erreur sur une catégorie ou un livre ne bloque pas forcément
-    toute l'extraction.
+def list_categories(categories):
+    """Affiche les catégories disponibles, une par ligne."""
+    for category_name in categories:
+        print(category_name)
 
-    Args:
-        selected_categories (dict): Catégories à traiter.
-        images_dir (Path): Dossier de sauvegarde des images de l'extraction.
-        logger (logging.Logger): Logger du programme.
 
-    Returns:
-        tuple: Liste de livres transformés, résumé par catégorie
-        et résumé du téléchargement des images.
-    """
+def list_books(categories, categories_argument, logger):
+    """Affiche uniquement les titres des livres."""
+    selected_categories = resolve_categories(
+        categories,
+        categories_argument,
+    )
+
+    if not selected_categories:
+        print("Aucune catégorie sélectionnée.")
+        print("Exemple : python src/main.py --list books --categories all")
+        return
+
+    for category_name, category_url in selected_categories.items():
+        try:
+            books = extract_book_links_from_category(
+                category_name,
+                category_url,
+            )
+        except Exception as error:
+            print(f"Erreur de lecture pour la catégorie : {category_name}")
+            logger.exception("Erreur catégorie %s : %s", category_name, error)
+            continue
+
+        for book in books:
+            print(book.get("title", ""))
+
+
+def print_book_details(book):
+    """Affiche les détails d'un livre."""
+    print()
+    print(f"Titre : {book['title']}")
+    print(f"Catégorie : {book['category']}")
+    print(f"UPC : {book['universal_product_code']}")
+    print(f"Prix TTC : {book['price_including_tax']}")
+    print(f"Prix HT : {book['price_excluding_tax']}")
+    print(f"Stock disponible : {book['number_available']}")
+    print(f"Note : {book['review_rating']}")
+    print(f"Image : {book['image_url']}")
+    print(f"Description : {book['product_description']}")
+    print("-" * 80)
+
+
+def show_details(categories, titles, categories_argument, logger):
+    """Affiche les détails des livres demandés."""
+    selected_categories = resolve_categories(
+        categories,
+        categories_argument,
+        default_all=True,
+    )
+
+    requested_titles = {title.casefold(): title for title in titles}
+    found_titles = set()
+
+    for category_name, category_url in selected_categories.items():
+        try:
+            books = extract_book_links_from_category(
+                category_name,
+                category_url,
+            )
+        except Exception as error:
+            print(f"Erreur de lecture pour la catégorie : {category_name}")
+            logger.exception("Erreur catégorie %s : %s", category_name, error)
+            continue
+
+        for book in books:
+            title = book.get("title", "")
+            title_key = title.casefold()
+
+            if title_key not in requested_titles:
+                continue
+
+            try:
+                details = extract_book_details(book)
+                transformed_book = transform_book(details)
+                print_book_details(transformed_book)
+                found_titles.add(title_key)
+
+            except Exception as error:
+                print(f"Erreur sur le livre : {title}")
+                logger.exception("Erreur livre %s : %s", title, error)
+
+    for title_key, requested_title in requested_titles.items():
+        if title_key not in found_titles:
+            print(f"Livre non trouvé : {requested_title}")
+
+
+def extract_books(selected_categories, images_dir, logger, quiet=False):
+    """Extrait les données, transforme les livres et télécharge les images."""
     transformed_books = []
-    extraction_summary = {}
-    images_summary = {
+    summary = {}
+    image_summary = {
         "downloaded": 0,
         "failed": 0,
     }
 
     for category_name, category_url in selected_categories.items():
-        print(f"Préparation de la catégorie : {category_name}")
-        logger.info("Début extraction catégorie : %s", category_name)
+        print_if_not_quiet(
+            f"Préparation de la catégorie : {category_name}",
+            quiet,
+        )
+        logger.info("Début catégorie : %s", category_name)
 
         try:
             book_links = extract_book_links_from_category(
                 category_name,
                 category_url,
             )
-            logger.info(
-                "%s livres trouvés dans la catégorie %s",
-                len(book_links),
-                category_name,
-            )
-
         except Exception as error:
-            print(
-                "Erreur lors de la préparation de la catégorie : "
-                f"{category_name}"
-            )
-            print("La catégorie est ignorée. Voir le fichier log.")
-            logger.exception(
-                "Erreur lors de la préparation de la catégorie %s : %s",
-                category_name,
-                error,
-            )
-            extraction_summary[category_name] = 0
+            print_if_not_quiet(f"Catégorie ignorée : {category_name}", quiet)
+            logger.exception("Erreur catégorie %s : %s", category_name, error)
+            summary[category_name] = 0
             continue
 
-        category_books_count = 0
+        count = 0
 
         for book in tqdm(
             book_links,
             desc=f"Extraction {category_name}",
             unit="livre",
+            disable=quiet,
         ):
             try:
-                book_details = extract_book_details(book)
-                transformed_book = transform_book(book_details)
+                details = extract_book_details(book)
+                transformed_book = transform_book(details)
 
-                image_file_name = build_image_file_name(transformed_book)
-                image_file_path = images_dir / image_file_name
+                image_name = build_image_file_name(transformed_book)
+                image_path = images_dir / image_name
 
                 if download_image(
                     transformed_book.get("image_url", ""),
-                    image_file_path,
+                    image_path,
                 ):
-                    images_summary["downloaded"] += 1
+                    image_summary["downloaded"] += 1
                 else:
-                    images_summary["failed"] += 1
+                    image_summary["failed"] += 1
 
                 transformed_books.append(transformed_book)
-                category_books_count += 1
+                count += 1
 
             except Exception as error:
-                product_page_url = book.get("product_page_url", "URL inconnue")
-
-                images_summary["failed"] += 1
+                image_summary["failed"] += 1
                 logger.exception(
-                    "Erreur lors de l'extraction du livre %s : %s",
-                    product_page_url,
+                    "Erreur livre %s : %s",
+                    book.get("product_page_url", "URL inconnue"),
                     error,
                 )
-                continue
 
-        extraction_summary[category_name] = category_books_count
+        summary[category_name] = count
+        print_if_not_quiet(f"Terminé : {count} livres extraits", quiet)
+        print_if_not_quiet("-" * 80, quiet)
 
-        logger.info(
-            "Fin extraction catégorie %s : %s livres extraits",
-            category_name,
-            category_books_count,
-        )
-
-        print(f"Terminé : {category_books_count} livres extraits")
-        print("-" * 80)
-
-    return transformed_books, extraction_summary, images_summary
+    return transformed_books, summary, image_summary
 
 
-def display_extraction_summary(extraction_summary, total_books):
-    """
-    Affiche un résumé propre de l'extraction.
-
-    Args:
-        extraction_summary (dict): Nombre de livres extraits par catégorie.
-        total_books (int): Nombre total de livres extraits.
-    """
+def print_summary(summary, total):
+    """Affiche le résumé de l'extraction."""
     print()
     print("Résumé de l'extraction :")
     print()
 
-    for category_name, books_count in extraction_summary.items():
-        print(f"- {category_name} : {books_count} livres")
+    for category_name, count in summary.items():
+        print(f"- {category_name} : {count} livres")
 
     print()
-    print(f"Total : {total_books} livres extraits")
+    print(f"Total : {total} livres extraits")
     print()
+
+
+def run_extraction(selected_categories, output_dir, logger, log_file, quiet=False):
+    """Lance l'extraction et sauvegarde les résultats."""
+    if not selected_categories:
+        print_if_not_quiet(
+            "Aucune catégorie sélectionnée. Fin du programme.",
+            quiet,
+        )
+        logger.warning("Aucune catégorie sélectionnée")
+        return
+
+    csv_path, images_dir = build_output_paths(output_dir)
+
+    books, summary, image_summary = extract_books(
+        selected_categories,
+        images_dir,
+        logger,
+        quiet=quiet,
+    )
+
+    if not quiet:
+        print_summary(summary, len(books))
+
+    if not books:
+        print_if_not_quiet(
+            "Aucun livre extrait. Aucun fichier CSV généré.",
+            quiet,
+        )
+        logger.warning("Aucun livre extrait")
+        return
+
+    try:
+        saved_csv_path = save_books_to_csv(books, csv_path)
+
+        if not quiet:
+            print()
+            print("Sauvegarde terminée.")
+            print(f"Fichier CSV généré : {saved_csv_path}")
+            print(f"Dossier images généré : {images_dir}")
+            print(
+                "Images téléchargées : "
+                f"{image_summary['downloaded']} réussies, "
+                f"{image_summary['failed']} en erreur"
+            )
+            print(f"Fichier log généré : {log_file}")
+
+        logger.info("Fichier CSV généré : %s", saved_csv_path)
+        logger.info("Dossier images généré : %s", images_dir)
+        logger.info(
+            "Images téléchargées : %s réussies, %s en erreur",
+            image_summary["downloaded"],
+            image_summary["failed"],
+        )
+
+    except Exception as error:
+        print_if_not_quiet("Erreur lors de la sauvegarde des données.", quiet)
+        print_if_not_quiet("Voir le fichier log pour le détail.", quiet)
+        logger.exception("Erreur sauvegarde : %s", error)
+
+
+def run_cli_mode(args, categories, logger, log_file):
+    """Lance le mode ligne de commande."""
+    if args.list_mode == "categories":
+        list_categories(categories)
+        return
+
+    if args.list_mode == "books":
+        list_books(categories, args.categories, logger)
+        return
+
+    if args.detail:
+        show_details(categories, args.detail, args.categories, logger)
+        return
+
+    if args.extract:
+        selected_categories = resolve_categories(
+            categories,
+            args.categories,
+        )
+
+        run_extraction(
+            selected_categories,
+            args.output,
+            logger,
+            log_file,
+            quiet=args.quiet,
+        )
+
+
+def run_interactive_mode(categories, logger, log_file):
+    """Lance le mode interactif."""
+    selected_categories = choose_interactive_categories(categories)
+
+    print()
+    print(f"Nombre de catégories sélectionnées : {len(selected_categories)}")
+    print()
+
+    run_extraction(
+        selected_categories,
+        output_dir=None,
+        logger=logger,
+        log_file=log_file,
+    )
 
 
 def main():
-    """
-    Point d'entrée principal du programme.
+    """Configure le programme puis lance le mode adapté."""
+    parser = parse_arguments()
+    args = parser.parse_args()
 
-    Cette fonction :
-    - configure les logs ;
-    - récupère les catégories depuis Books to Scrape ;
-    - demande à l'utilisateur quelles catégories traiter ;
-    - prépare les chemins de sortie ;
-    - extrait les livres détaillés des catégories choisies ;
-    - transforme les données extraites ;
-    - télécharge les images pendant l'extraction ;
-    - sauvegarde les résultats dans un fichier CSV ;
-    - affiche un résumé de l'extraction.
-    """
+    if len(sys.argv) == 1:
+        parser.print_help()
+        return
+
+    validate_arguments(parser, args)
+
     logger, log_file = setup_logger()
 
     try:
@@ -254,67 +505,17 @@ def main():
         logger.info("%s catégories récupérées", len(categories))
 
     except Exception as error:
-        print("Impossible de récupérer les catégories.")
-        print("Fin du programme. Voir le fichier log pour le détail.")
-        logger.exception("Erreur lors de la récupération des catégories : %s", error)
+        if not args.quiet:
+            print("Impossible de récupérer les catégories.")
+            print("Fin du programme. Voir le fichier log pour le détail.")
+
+        logger.exception("Erreur catégories : %s", error)
         return
 
-    selected_categories = get_categories_to_process(categories)
-
-    print()
-    print(f"Nombre de catégories sélectionnées : {len(selected_categories)}")
-    print()
-
-    if not selected_categories:
-        print("Aucune catégorie sélectionnée. Fin du programme.")
-        logger.warning("Aucune catégorie sélectionnée")
-        return
-
-    csv_output_path = get_default_csv_path()
-    images_dir = get_images_dir_from_csv_path(csv_output_path)
-
-    transformed_books, extraction_summary, images_summary = extract_selected_categories(
-        selected_categories,
-        images_dir,
-        logger,
-    )
-
-    display_extraction_summary(
-        extraction_summary,
-        total_books=len(transformed_books),
-    )
-
-    if not transformed_books:
-        print("Aucun livre extrait. Aucun fichier CSV généré.")
-        logger.warning("Aucun livre extrait")
-        return
-
-    try:
-        saved_csv_path = save_books_to_csv(transformed_books, csv_output_path)
-
-        print()
-        print("Sauvegarde terminée.")
-        print(f"Fichier CSV généré : {saved_csv_path}")
-        print(f"Dossier images généré : {images_dir}")
-        print(
-            "Images téléchargées : "
-            f"{images_summary['downloaded']} réussies, "
-            f"{images_summary['failed']} en erreur"
-        )
-        print(f"Fichier log généré : {log_file}")
-
-        logger.info("Fichier CSV généré : %s", saved_csv_path)
-        logger.info("Dossier images généré : %s", images_dir)
-        logger.info(
-            "Images téléchargées : %s réussies, %s en erreur",
-            images_summary["downloaded"],
-            images_summary["failed"],
-        )
-
-    except Exception as error:
-        print("Erreur lors de la sauvegarde des données.")
-        print("Voir le fichier log pour le détail.")
-        logger.exception("Erreur lors de la sauvegarde des données : %s", error)
+    if args.interactive:
+        run_interactive_mode(categories, logger, log_file)
+    else:
+        run_cli_mode(args, categories, logger, log_file)
 
 
 if __name__ == "__main__":

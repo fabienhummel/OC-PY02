@@ -10,12 +10,16 @@ Découpage ETL :
 - Load : écriture CSV et sauvegarde des fichiers dans un autre module.
 """
 
+import logging  # Permet de tracer les erreurs sans afficher dans le terminal.
 import time  # Permet d'attendre entre deux tentatives en cas d'erreur réseau.
 from urllib.parse import urljoin  # Transforme une URL relative en URL complète.
 
 import requests  # Récupère le contenu HTML d'une page web.
 from bs4 import BeautifulSoup  # Analyse le HTML pour en extraire des éléments.
 from requests.exceptions import RequestException  # Capture les erreurs réseau.
+
+
+LOGGER = logging.getLogger("books_scraper")
 
 
 def get_soup(page_url, retries=3, timeout=20):
@@ -41,20 +45,20 @@ def get_soup(page_url, retries=3, timeout=20):
     for attempt in range(1, retries + 1):
         try:
             response = requests.get(page_url, timeout=timeout)
-
-            # Arrête la tentative si la réponse HTTP est une erreur.
             response.raise_for_status()
-
-            # Force l'encodage UTF-8 pour éviter les problèmes avec le symbole £.
             response.encoding = "utf-8"
 
             return BeautifulSoup(response.text, "html.parser")
 
         except RequestException as error:
             last_error = error
-            print(
-                f"Erreur réseau sur {page_url} "
-                f"(tentative {attempt}/{retries})"
+
+            LOGGER.warning(
+                "Erreur réseau sur %s tentative %s/%s : %s",
+                page_url,
+                attempt,
+                retries,
+                error,
             )
 
             if attempt < retries:
@@ -80,7 +84,6 @@ def extract_categories(home_url):
     soup = get_soup(home_url)
     categories = {}
 
-    # Sélectionne les liens des catégories dans la colonne de gauche.
     category_links = soup.select("div.side_categories ul li a")
 
     for link in category_links:
@@ -117,16 +120,12 @@ def extract_number_of_pages(category_url):
         current_page_text = current_page.get_text(strip=True)
         return int(current_page_text.split()[-1])
 
-    # Si aucun bloc de pagination n'existe, la catégorie contient une seule page.
     return 1
 
 
 def build_category_page_url(category_url, page_number):
     """
     Construit l'URL d'une page de catégorie.
-
-    La première page utilise index.html.
-    Les pages suivantes utilisent le format page-2.html, page-3.html, etc.
 
     Args:
         category_url (str): URL de la première page de catégorie.
@@ -148,12 +147,6 @@ def extract_book_links_from_category(category_name, category_url):
     """
     Extrait les liens des livres présents dans toutes les pages d'une catégorie.
 
-    Cette fonction récupère seulement les informations nécessaires pour aller
-    ensuite consulter chaque page détail :
-    - la catégorie ;
-    - le titre du livre ;
-    - l'URL de la page produit.
-
     Args:
         category_name (str): Nom de la catégorie.
         category_url (str): URL de la première page de catégorie.
@@ -168,7 +161,6 @@ def extract_book_links_from_category(category_name, category_url):
         page_url = build_category_page_url(category_url, page_number)
         soup = get_soup(page_url)
 
-        # Chaque livre affiché sur une page de catégorie est dans un article.
         book_cards = soup.select("article.product_pod")
 
         for book_card in book_cards:
@@ -194,15 +186,6 @@ def extract_product_information_table(soup):
     """
     Extrait le tableau Product Information d'une page produit.
 
-    Le tableau contient notamment :
-    - UPC ;
-    - Product Type ;
-    - Price excl. tax ;
-    - Price incl. tax ;
-    - Tax ;
-    - Availability ;
-    - Number of reviews.
-
     Args:
         soup (BeautifulSoup): Page produit analysée avec BeautifulSoup.
 
@@ -227,9 +210,6 @@ def extract_product_description(soup):
     """
     Extrait la description d'un livre depuis une page produit.
 
-    Sur Books to Scrape, la description se trouve dans le paragraphe
-    qui suit le bloc dont l'id est product_description.
-
     Args:
         soup (BeautifulSoup): Page produit analysée avec BeautifulSoup.
 
@@ -253,9 +233,6 @@ def extract_product_category(soup, default_category=""):
     """
     Extrait la catégorie depuis le fil d'Ariane d'une page produit.
 
-    Si la catégorie n'est pas trouvée dans la page détail, la fonction retourne
-    la catégorie déjà connue depuis la page catégorie.
-
     Args:
         soup (BeautifulSoup): Page produit analysée avec BeautifulSoup.
         default_category (str): Catégorie connue depuis la page catégorie.
@@ -274,12 +251,6 @@ def extract_product_category(soup, default_category=""):
 def extract_product_rating(soup):
     """
     Extrait la note brute d'un livre depuis la page produit.
-
-    Exemple HTML :
-    <p class="star-rating Three">
-
-    La fonction retourne "Three". La conversion en 3 sera faite dans
-    le module transform.py.
 
     Args:
         soup (BeautifulSoup): Page produit analysée avec BeautifulSoup.
@@ -302,9 +273,6 @@ def extract_product_image_url(soup, product_page_url):
     """
     Extrait l'URL de l'image depuis une page produit.
 
-    On utilise l'image de la page détail, car elle est plus pertinente que
-    la miniature affichée sur les pages de catégorie.
-
     Args:
         soup (BeautifulSoup): Page produit analysée avec BeautifulSoup.
         product_page_url (str): URL de la page produit.
@@ -325,13 +293,8 @@ def extract_book_details(book):
     """
     Extrait les informations détaillées d'un livre depuis sa page produit.
 
-    Si une information existe à la fois sur la page catégorie et sur la page
-    détail, la page détail est prioritaire.
-
     Args:
-        book (dict): Dictionnaire contenant au minimum :
-            - category ;
-            - product_page_url.
+        book (dict): Dictionnaire contenant au minimum category et product_page_url.
 
     Returns:
         dict: Dictionnaire contenant les informations détaillées du livre.
