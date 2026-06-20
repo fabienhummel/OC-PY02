@@ -241,3 +241,7 @@ images/*
 
 # IDE settings
 .idea/
+
+# Logs
+logs/
+#*.log

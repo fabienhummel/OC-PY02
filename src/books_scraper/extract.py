@@ -10,34 +10,57 @@ Découpage ETL :
 - Load : écriture CSV et sauvegarde des fichiers dans un autre module.
 """
 
+import time  # Permet d'attendre entre deux tentatives en cas d'erreur réseau.
 from urllib.parse import urljoin  # Transforme une URL relative en URL complète.
 
 import requests  # Récupère le contenu HTML d'une page web.
 from bs4 import BeautifulSoup  # Analyse le HTML pour en extraire des éléments.
+from requests.exceptions import RequestException  # Capture les erreurs réseau.
 
 
-def get_soup(page_url):
+def get_soup(page_url, retries=3, timeout=20):
     """
     Récupère une page web et la transforme en objet BeautifulSoup.
 
-    Cette fonction évite de répéter le même code requests + BeautifulSoup
-    dans toutes les fonctions d'extraction.
+    La fonction tente plusieurs fois de récupérer la page en cas d'erreur
+    réseau temporaire.
 
     Args:
         page_url (str): URL de la page à récupérer.
+        retries (int): Nombre de tentatives avant abandon.
+        timeout (int): Temps maximum d'attente en secondes.
 
     Returns:
         BeautifulSoup: Objet permettant de rechercher des éléments HTML.
+
+    Raises:
+        RequestException: Si la page reste inaccessible après les tentatives.
     """
-    response = requests.get(page_url, timeout=10)
+    last_error = None
 
-    # Arrête le programme si la page n'est pas accessible.
-    response.raise_for_status()
+    for attempt in range(1, retries + 1):
+        try:
+            response = requests.get(page_url, timeout=timeout)
 
-    # Force l'encodage UTF-8 pour éviter les problèmes d'affichage du symbole £.
-    response.encoding = "utf-8"
+            # Arrête la tentative si la réponse HTTP est une erreur.
+            response.raise_for_status()
 
-    return BeautifulSoup(response.text, "html.parser")
+            # Force l'encodage UTF-8 pour éviter les problèmes avec le symbole £.
+            response.encoding = "utf-8"
+
+            return BeautifulSoup(response.text, "html.parser")
+
+        except RequestException as error:
+            last_error = error
+            print(
+                f"Erreur réseau sur {page_url} "
+                f"(tentative {attempt}/{retries})"
+            )
+
+            if attempt < retries:
+                time.sleep(2)
+
+    raise last_error
 
 
 def extract_categories(home_url):
@@ -45,8 +68,7 @@ def extract_categories(home_url):
     Extrait les catégories depuis la page d'accueil Books to Scrape.
 
     La catégorie globale "Books" est volontairement ignorée, car elle regroupe
-    tous les livres et ne représente pas une vraie catégorie métier exploitable
-    pour générer un CSV par catégorie.
+    tous les livres et ne permet pas de produire un CSV par vraie catégorie.
 
     Args:
         home_url (str): URL de la page d'accueil du site.
@@ -56,7 +78,6 @@ def extract_categories(home_url):
         et son URL complète en valeur.
     """
     soup = get_soup(home_url)
-
     categories = {}
 
     # Sélectionne les liens des catégories dans la colonne de gauche.
@@ -90,7 +111,6 @@ def extract_number_of_pages(category_url):
         int: Nombre total de pages pour cette catégorie.
     """
     soup = get_soup(category_url)
-
     current_page = soup.select_one("li.current")
 
     if current_page:
@@ -187,7 +207,6 @@ def extract_product_information_table(soup):
         dict: Dictionnaire contenant les données du tableau.
     """
     product_information = {}
-
     rows = soup.select("table.table-striped tr")
 
     for row in rows:
@@ -256,8 +275,8 @@ def extract_product_rating(soup):
     Exemple HTML :
     <p class="star-rating Three">
 
-    La fonction retourne "Three". La conversion en 3 sera faite plus tard
-    dans le module de transformation.
+    La fonction retourne "Three". La conversion en 3 sera faite dans
+    le module transform.py.
 
     Args:
         soup (BeautifulSoup): Page produit analysée avec BeautifulSoup.
@@ -346,44 +365,3 @@ def extract_book_details(book):
     }
 
     return product_details
-
-
-def extract_books_details(books):
-    """
-    Extrait les détails de tous les livres d'une liste.
-
-    Args:
-        books (list): Liste de dictionnaires contenant les liens des livres.
-
-    Returns:
-        list: Liste de dictionnaires contenant les détails des livres.
-    """
-    detailed_books = []
-
-    for book in books:
-        book_details = extract_book_details(book)
-        detailed_books.append(book_details)
-
-    return detailed_books
-
-
-def extract_books_from_category(category_name, category_url):
-    """
-    Extrait tous les livres détaillés d'une catégorie.
-
-    Cette fonction orchestre l'extraction pour une catégorie :
-    - récupérer les liens des livres ;
-    - visiter chaque page produit ;
-    - récupérer les données détaillées.
-
-    Args:
-        category_name (str): Nom de la catégorie.
-        category_url (str): URL de la première page de catégorie.
-
-    Returns:
-        list: Liste de dictionnaires contenant les livres détaillés.
-    """
-    books = extract_book_links_from_category(category_name, category_url)
-    detailed_books = extract_books_details(books)
-
-    return detailed_books
