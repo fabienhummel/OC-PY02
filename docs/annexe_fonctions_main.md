@@ -5,7 +5,7 @@
 
 ## Rôle du fichier
 
-`main.py` est le point d'entrée du programme. Il orchestre l'exécution : lecture des options, choix du mode, extraction, transformation, sauvegarde CSV, téléchargement des images et affichage des résultats.
+`main.py` est le point d'entrée du programme. Il orchestre l'exécution : lecture des options, choix du mode, extraction, transformation, sauvegarde des CSV par catégorie, téléchargement des images et affichage des résultats.
 
 ## Fonctions
 
@@ -15,15 +15,16 @@
 | `validate_arguments(parser, args)` | Vérifie que les combinaisons d'options sont cohérentes. |
 | `choose_interactive_categories(categories)` | Affiche le menu interactif de sélection des catégories. |
 | `resolve_categories(categories, categories_argument, default_all=False, logger=None, quiet=False)` | Transforme l'argument `--categories` en dictionnaire de catégories à traiter. |
-| `build_output_paths(output_dir=None)` | Prépare le chemin du CSV et le dossier images associé. |
+| `build_export_dir(output_dir=None)` | Prépare le dossier racine daté de l'extraction. |
 | `print_if_not_quiet(message='', quiet=False)` | Affiche un message uniquement si le mode silencieux est désactivé. |
 | `list_categories(categories)` | Affiche les catégories disponibles. |
 | `list_books(categories, categories_argument, logger)` | Affiche uniquement les titres des livres des catégories choisies. |
 | `print_book_details(book)` | Affiche les détails d'un livre. |
 | `show_details(categories, titles, categories_argument, logger)` | Recherche et affiche les détails d'un ou plusieurs livres. |
-| `extract_books(selected_categories, images_dir, logger, quiet=False)` | Extrait les livres, transforme les données et télécharge les images. |
+| `extract_books(selected_categories, export_dir, logger, quiet=False)` | Extrait les livres catégorie par catégorie, transforme les données et télécharge les images dans chaque dossier de catégorie. |
 | `print_summary(summary, total)` | Affiche le résumé de l'extraction. |
-| `run_extraction(selected_categories, output_dir, logger, log_file, quiet=False)` | Lance une extraction complète et sauvegarde les fichiers. |
+| `save_category_csv_files(books_by_category, export_dir, logger)` | Sauvegarde un fichier CSV par catégorie. |
+| `run_extraction(selected_categories, output_dir, logger, log_file, quiet=False)` | Lance une extraction complète et sauvegarde les fichiers générés. |
 | `run_cli_mode(args, categories, logger, log_file)` | Lance le mode ligne de commande et prépare la liste des titres demandés avec `--detail`. |
 | `run_interactive_mode(categories, logger, log_file)` | Lance le mode interactif. |
 | `main()` | Configure le programme et lance le mode adapté. |
@@ -34,4 +35,6 @@
 - Il coordonne les modules `extract`, `transform`, `load` et `logger_config`.
 - Il gère les modes interactif et non interactif.
 - Il applique le mode `--quiet` pour limiter les sorties terminal pendant l'extraction.
-- L'option `--detail` accepte désormais plusieurs titres après une seule option, par exemple `--detail "Titre 1" "Titre 2"`.
+- L'option `--detail` accepte plusieurs titres après une seule option, par exemple `--detail "Titre 1" "Titre 2"`.
+- L'extraction génère désormais un dossier daté, puis un sous-dossier par catégorie.
+- Chaque catégorie contient son propre fichier CSV et son propre dossier `images/`.
