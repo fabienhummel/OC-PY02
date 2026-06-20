@@ -17,12 +17,10 @@ Il permet de contrôler :
 - les commandes principales du programme ;
 - le mode interactif ;
 - l'extraction des données ;
-- la génération du CSV ;
-- le téléchargement des images ;
+- la génération d'un CSV par catégorie ;
+- le téléchargement des images dans le dossier de leur catégorie ;
 - la création des logs ;
-- la nouvelle syntaxe de l'option `--detail`.
-
-Ce document peut être complété avec des captures d'écran pendant les tests.
+- la syntaxe de l'option `--detail`.
 
 > 🔴 **Remarque :** les zones rouges ci-dessous indiquent les emplacements où coller les captures d'écran.  
 > Si la couleur rouge n'est pas affichée dans GitHub, le texte reste identifiable grâce au symbole 🔴.
@@ -30,8 +28,6 @@ Ce document peut être complété avec des captures d'écran pendant les tests.
 ---
 
 ## 2. Préparation avant les tests
-
-### Conditions de départ
 
 Les tests doivent être réalisés depuis la racine du projet :
 
@@ -46,8 +42,6 @@ source .venv/bin/activate
 ```
 
 ### Vérification de l'état Git
-
-**Commande à lancer :**
 
 ```bash
 git status
@@ -95,7 +89,7 @@ Le terminal doit afficher l'aide du programme avec les options disponibles, nota
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran de l'aide affichée par python src/main.py.
+🔴 À COLLER ICI : capture d'écran de l'aide affichée.
 </div>
 
 ---
@@ -154,8 +148,6 @@ python src/main.py --list books --categories "Fantasy"
 
 Le terminal doit afficher uniquement les titres des livres de la catégorie `Fantasy`.
 
-Aucun détail complet de livre ne doit être affiché : seulement les titres.
-
 ### Statut
 
 - [ ] Réussi
@@ -208,7 +200,7 @@ Le terminal doit afficher les informations du livre, notamment :
 
 ### Objectif
 
-Vérifier que la nouvelle syntaxe de `--detail` accepte plusieurs titres après une seule option.
+Vérifier que `--detail` accepte plusieurs titres après une seule option.
 
 ### Commande à lancer
 
@@ -218,12 +210,7 @@ python src/main.py --detail "A Light in the Attic" "Soulless"
 
 ### Résultat attendu
 
-Le terminal doit afficher successivement les détails des deux livres :
-
-- `A Light in the Attic` ;
-- `Soulless`.
-
-Le programme ne doit pas retourner d'erreur liée aux arguments.
+Le terminal doit afficher successivement les détails des deux livres.
 
 ### Statut
 
@@ -252,8 +239,6 @@ python src/main.py --detail "A Light in the Attic" --detail "Soulless"
 
 Le terminal doit afficher les détails des deux livres.
 
-Ce test confirme que la modification de `--detail` n'a pas cassé l'ancienne utilisation.
-
 ### Statut
 
 - [ ] Réussi
@@ -280,8 +265,6 @@ python src/main.py --detail "Scott Pilgrim, Volume 1: Scott Pilgrim's Precious L
 ### Résultat attendu
 
 Le programme doit rechercher le titre complet, sans découper le titre au niveau de la virgule.
-
-Si le titre existe sur le site, ses détails doivent être affichés. Sinon, le message `Livre non trouvé` doit reprendre le titre complet.
 
 ### Statut
 
@@ -340,8 +323,10 @@ python src/main.py --extract --categories "Fantasy"
 Le programme doit :
 
 - afficher la progression de l'extraction ;
-- générer un fichier CSV dans `outputs/` ;
-- générer un dossier d'images dans `images/` ;
+- créer un dossier d'extraction daté dans `outputs/` ;
+- créer un sous-dossier `fantasy/` ;
+- générer `fantasy/fantasy.csv` ;
+- générer `fantasy/images/` ;
 - générer un fichier log dans `logs/` ;
 - afficher un résumé final.
 
@@ -360,7 +345,7 @@ Le programme doit :
 
 ### Objectif
 
-Vérifier que plusieurs catégories peuvent être extraites dans une seule exécution.
+Vérifier que plusieurs catégories peuvent être extraites dans une seule exécution et que chaque catégorie dispose de son propre CSV.
 
 ### Commande à lancer
 
@@ -370,7 +355,17 @@ python src/main.py --extract --categories "Classics,Philosophy"
 
 ### Résultat attendu
 
-Le programme doit extraire les livres des catégories `Classics` et `Philosophy`.
+Le programme doit générer une structure similaire à :
+
+```text
+outputs/books_extraction_YYYYMMDD_HHMMSS/
+├── classics/
+│   ├── classics.csv
+│   └── images/
+└── philosophy/
+    ├── philosophy.csv
+    └── images/
+```
 
 Le résumé final doit afficher le nombre de livres extraits par catégorie et le total.
 
@@ -389,7 +384,7 @@ Le résumé final doit afficher le nombre de livres extraits par catégorie et l
 
 ### Objectif
 
-Vérifier que l'option `--output` permet de choisir un dossier de sortie.
+Vérifier que l'option `--output` permet de choisir le dossier contenant le dossier d'extraction.
 
 ### Commande à lancer
 
@@ -402,8 +397,10 @@ python src/main.py --extract --categories "Fantasy" --output "./exports_test"
 Le programme doit générer :
 
 ```text
-exports_test/books_extraction_YYYYMMDD_HHMMSS.csv
-exports_test/images/books_extraction_YYYYMMDD_HHMMSS/
+exports_test/books_extraction_YYYYMMDD_HHMMSS/
+└── fantasy/
+    ├── fantasy.csv
+    └── images/
 ```
 
 Le fichier log doit rester dans le dossier `logs/`.
@@ -437,8 +434,9 @@ Le terminal doit rester silencieux ou presque silencieux.
 
 Les fichiers doivent tout de même être générés :
 
-- CSV ;
-- images ;
+- dossier d'extraction ;
+- CSV de la catégorie ;
+- images de la catégorie ;
 - log.
 
 ### Statut
@@ -452,34 +450,33 @@ Les fichiers doivent tout de même être générés :
 
 ---
 
-## 15. Test 13 — Vérification du fichier CSV
+## 15. Test 13 — Vérification des fichiers CSV
 
 ### Objectif
 
-Vérifier que le CSV généré contient les colonnes attendues.
+Vérifier que les CSV générés contiennent les colonnes attendues.
 
 ### Commande à lancer
-
-Remplacer le nom du fichier par le dernier CSV généré :
 
 ```bash
 python - <<'PY'
 import csv
 from pathlib import Path
 
-csv_files = sorted(Path('outputs').glob('books_extraction_*.csv'))
-latest_csv = csv_files[-1]
+csv_files = sorted(Path('outputs').glob('books_extraction_*/**/*.csv'))
 
-with latest_csv.open(encoding='utf-8-sig', newline='') as csv_file:
-    reader = csv.DictReader(csv_file)
-    print(latest_csv)
-    print(reader.fieldnames)
+for csv_path in csv_files[-3:]:
+    with csv_path.open(encoding='utf-8-sig', newline='') as csv_file:
+        reader = csv.DictReader(csv_file)
+        print(csv_path)
+        print(reader.fieldnames)
+        print()
 PY
 ```
 
 ### Résultat attendu
 
-Le terminal doit afficher les colonnes suivantes :
+Chaque CSV doit afficher les colonnes suivantes :
 
 ```text
 product_page_url
@@ -500,7 +497,7 @@ image_url
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran des colonnes affichées depuis le dernier CSV généré.
+🔴 À COLLER ICI : capture d'écran des colonnes affichées depuis les CSV générés.
 </div>
 
 ---
@@ -509,23 +506,23 @@ image_url
 
 ### Objectif
 
-Vérifier que les images sont bien téléchargées localement.
+Vérifier que les images sont bien téléchargées dans les dossiers de catégories.
 
 ### Commande à lancer
 
 ```bash
-find images -type f | head
+find outputs -path "*/images/*" -type f | head
 ```
 
 ### Résultat attendu
 
-Le terminal doit afficher plusieurs fichiers images.
+Le terminal doit afficher plusieurs fichiers images situés dans des dossiers de ce type :
 
-Les noms doivent être lisibles et contenir des éléments comme :
+```text
+outputs/books_extraction_YYYYMMDD_HHMMSS/fantasy/images/
+```
 
-- la catégorie ;
-- le titre du livre ;
-- l'UPC.
+Les noms doivent être lisibles et contenir des éléments comme la catégorie, le titre du livre et l'UPC.
 
 ### Statut
 
@@ -583,7 +580,7 @@ git status
 
 ### Résultat attendu
 
-Les fichiers générés dans `outputs/`, `images/`, `logs/` ou `exports_test/` ne doivent pas être proposés comme fichiers à committer.
+Les fichiers générés dans `outputs/`, `logs/` ou `exports_test/` ne doivent pas être proposés comme fichiers à committer.
 
 Si certains fichiers apparaissent, il faut vérifier le fichier `.gitignore`.
 
@@ -604,13 +601,13 @@ Si certains fichiers apparaissent, il faut vérifier le fichier `.gitignore`.
 
 Supprimer les fichiers générés uniquement pour les tests si nécessaire.
 
-### Commandes possibles
+### Commande possible
 
 ```bash
 rm -rf exports_test
 ```
 
-Les dossiers `outputs/`, `images/` et `logs/` peuvent être conservés localement le temps de préparer le ZIP demandé dans les livrables.
+Les dossiers `outputs/` et `logs/` peuvent être conservés localement le temps de préparer le ZIP demandé dans les livrables.
 
 ---
 
@@ -625,8 +622,8 @@ Les dossiers `outputs/`, `images/` et `logs/` peuvent être conservés localemen
 | Le détail de plusieurs livres fonctionne | [ ] OK |
 | L'extraction d'une catégorie fonctionne | [ ] OK |
 | L'extraction de plusieurs catégories fonctionne | [ ] OK |
-| Le CSV est généré | [ ] OK |
-| Les images sont téléchargées | [ ] OK |
+| Un CSV est généré par catégorie | [ ] OK |
+| Les images sont téléchargées dans le dossier de leur catégorie | [ ] OK |
 | Les logs sont générés | [ ] OK |
 | Les fichiers générés ne sont pas versionnés | [ ] OK |
 
