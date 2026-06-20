@@ -213,19 +213,13 @@ python src/main.py --list books --categories "Fantasy,Travel"
 python src/main.py --detail "A Light in the Attic"
 ```
 
-Pour plusieurs livres :
+Pour plusieurs livres, répéter l'option `--detail` :
 
 ```bash
-python src/main.py --detail "A Light in the Attic" "Soulless"
+python src/main.py --detail "A Light in the Attic" --detail "Soulless"
 ```
 
-Cette syntaxe permet de passer plusieurs titres sans répéter l'option `--detail`. Les titres contenant des virgules restent correctement gérés s'ils sont placés entre guillemets.
-
-Si un titre contient un guillemet double, il est possible d'utiliser des apostrophes autour du titre :
-
-```bash
-python src/main.py --detail 'Titre avec " dans le nom du livre' "Second livre"
-```
+Cette syntaxe permet de gérer correctement les titres contenant des virgules.
 
 ## Fichiers générés
 
