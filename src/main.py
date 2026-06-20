@@ -12,7 +12,6 @@ Navigation dans les menus :
 - entrée pour valider.
 """
 
-import logging  # Permet de tracer les actions et les erreurs.
 import questionary  # Permet de créer des menus interactifs dans le terminal.
 from tqdm import tqdm  # Permet d'afficher une barre de progression.
 
