@@ -17,6 +17,7 @@ Les tests UAT vérifient que le livrable répond bien au cahier des charges dema
 - installation possible avec `requirements.txt` ;
 - génération des données attendues ;
 - présence des champs demandés dans les CSV ;
+- génération d'un CSV distinct par catégorie ;
 - téléchargement des images ;
 - organisation simple des données générées ;
 - présence du mail PDF décrivant le pipeline ETL.
@@ -82,29 +83,12 @@ Le repository GitHub doit permettre à Sam ou à un utilisateur testeur de récu
 
 ### Actions à réaliser
 
-Cloner le repository :
-
 ```bash
 git clone https://github.com/fabienhummel/OC-PY02.git
 cd OC-PY02
-```
-
-Créer et activer l'environnement virtuel :
-
-```bash
 python -m venv .venv
 source .venv/bin/activate
-```
-
-Installer les dépendances :
-
-```bash
 python -m pip install -r requirements.txt
-```
-
-Afficher l'aide du programme :
-
-```bash
 python src/main.py
 ```
 
@@ -117,7 +101,7 @@ python src/main.py
 
 ### Critère d'acceptation
 
-Le test est réussi si un utilisateur peut installer le projet et afficher l'aide du programme en suivant uniquement les instructions fournies.
+Le test est réussi si un utilisateur peut installer le projet et afficher l'aide du programme en suivant les instructions fournies.
 
 ### Statut
 
@@ -163,9 +147,9 @@ Vérifier que les éléments suivants ne sont pas versionnés :
 
 ```text
 .venv/
-outputs/*.csv
-images/*
+outputs/books_extraction_*/
 logs/*.log
+exports_test/
 ```
 
 ### Résultat attendu
@@ -221,13 +205,14 @@ Le programme doit :
 
 - parcourir la catégorie `Fantasy` ;
 - extraire les livres de cette catégorie ;
-- générer un fichier CSV ;
-- télécharger les images associées ;
+- générer un dossier d'extraction daté ;
+- générer `fantasy/fantasy.csv` ;
+- télécharger les images dans `fantasy/images/` ;
 - afficher un résumé final de l'extraction.
 
 ### Critère d'acceptation
 
-Le test est réussi si l'extraction se termine sans erreur bloquante et si un CSV ainsi qu'un dossier d'images sont générés.
+Le test est réussi si l'extraction se termine sans erreur bloquante et si le CSV ainsi que le dossier d'images de la catégorie sont générés.
 
 ### Statut
 
@@ -256,11 +241,9 @@ Le CSV généré doit contenir les champs demandés dans le cahier des charges.
 ### Préconditions
 
 - Une extraction a déjà été réalisée.
-- Un fichier CSV est présent dans le dossier `outputs/` ou dans le dossier de sortie choisi.
+- Au moins un fichier CSV est présent dans un dossier de catégorie.
 
 ### Action à réaliser
-
-Ouvrir le CSV généré et vérifier les colonnes.
 
 Commande possible :
 
@@ -269,7 +252,7 @@ python - <<'PY'
 import csv
 from pathlib import Path
 
-csv_files = sorted(Path('outputs').glob('books_extraction_*.csv'))
+csv_files = sorted(Path('outputs').glob('books_extraction_*/**/*.csv'))
 latest_csv = csv_files[-1]
 
 with latest_csv.open(encoding='utf-8-sig', newline='') as csv_file:
@@ -326,7 +309,7 @@ Les données extraites doivent être exploitables par Sam pour l'analyse de marc
 
 ### Préconditions
 
-- Un fichier CSV a été généré.
+- Un fichier CSV de catégorie a été généré.
 
 ### Action à réaliser
 
@@ -382,10 +365,6 @@ L'application doit parcourir les pages d'une catégorie, y compris lorsqu'une ca
 
 ### Action à réaliser
 
-Lancer une extraction sur une catégorie comportant plusieurs livres et vérifier que l'extraction ne se limite pas à la première page.
-
-Commande possible :
-
 ```bash
 python src/main.py --extract --categories "Default"
 ```
@@ -436,11 +415,11 @@ python src/main.py --extract --categories all
 
 ### Résultat attendu
 
-Le programme doit extraire les livres de toutes les catégories disponibles et générer les fichiers de sortie associés.
+Le programme doit extraire les livres de toutes les catégories disponibles et générer un dossier par catégorie dans le dossier d'extraction.
 
 ### Critère d'acceptation
 
-Le test est réussi si l'extraction complète se termine sans erreur bloquante et si les données sont générées.
+Le test est réussi si l'extraction complète se termine sans erreur bloquante et si les données sont générées par catégorie.
 
 ### Statut
 
@@ -483,19 +462,16 @@ python src/main.py --extract --categories "Classics,Philosophy"
 Le programme doit générer un CSV distinct pour chaque catégorie extraite, par exemple :
 
 ```text
-Classics.csv
-Philosophy.csv
+outputs/books_extraction_YYYYMMDD_HHMMSS/
+├── classics/
+│   └── classics.csv
+└── philosophy/
+    └── philosophy.csv
 ```
-
-ou une convention équivalente clairement identifiable.
 
 ### Critère d'acceptation
 
-Le test est réussi si chaque catégorie extraite produit son propre fichier CSV.
-
-### Remarque
-
-À la date de création de ce document, cette exigence doit être vérifiée avec attention. Si le programme génère encore un CSV global par extraction, le test doit être marqué `À corriger`.
+Le test est réussi si chaque catégorie extraite produit son propre fichier CSV dans son propre dossier de catégorie.
 
 ### Statut
 
@@ -510,7 +486,7 @@ Le test est réussi si chaque catégorie extraite produit son propre fichier CSV
 
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran montrant les CSV générés par catégorie, ou l'écart constaté.
+🔴 À COLLER ICI : capture d'écran montrant les CSV générés par catégorie.
 </div>
 
 ---
@@ -524,25 +500,21 @@ Les images des livres extraits doivent être téléchargées et fournies avec le
 ### Préconditions
 
 - Une extraction a été réalisée.
-- Un dossier d'images a été généré.
+- Un dossier d'images a été généré dans au moins une catégorie.
 
 ### Action à réaliser
 
-Vérifier le contenu du dossier images généré.
-
-Commande possible :
-
 ```bash
-find images -type f | head
+find outputs -path "*/images/*" -type f | head
 ```
 
 ### Résultat attendu
 
-Le dossier images doit contenir des fichiers images correspondant aux livres extraits.
+Le dossier `images/` de chaque catégorie doit contenir des fichiers images correspondant aux livres extraits.
 
 ### Critère d'acceptation
 
-Le test est réussi si les images sont présentes et organisées de manière compréhensible.
+Le test est réussi si les images sont présentes et organisées dans le dossier de leur catégorie.
 
 ### Statut
 
@@ -575,16 +547,19 @@ Sam demande un fichier ZIP contenant les données générées et les images extr
 
 ### Action à réaliser
 
-Créer ou vérifier le ZIP final contenant les données générées.
+Créer ou vérifier le ZIP final contenant le dossier d'extraction généré.
 
 Structure attendue recommandée :
 
 ```text
 OC-PY02_donnees_generees.zip
-├── csv/
-│   └── fichiers CSV générés
-└── images/
-    └── images extraites
+└── books_extraction_YYYYMMDD_HHMMSS/
+    ├── classics/
+    │   ├── classics.csv
+    │   └── images/
+    └── philosophy/
+        ├── philosophy.csv
+        └── images/
 ```
 
 ### Résultat attendu
