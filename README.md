@@ -3,7 +3,7 @@
 Projet 2 de la formation OpenClassrooms **Développeur d'application Python** :
 **Utilisez les bases de Python pour l'analyse de marché**.
 
-Ce projet consiste à développer un programme Python capable d'extraire les informations de livres depuis le site [Books to Scrape](https://books.toscrape.com/), puis de sauvegarder les données dans un fichier CSV et de télécharger les images associées.
+Ce projet consiste à développer un programme Python capable d'extraire les informations de livres depuis le site [Books to Scrape](https://books.toscrape.com/), puis de sauvegarder les données dans des fichiers CSV et de télécharger les images associées.
 
 ## Objectif du projet
 
@@ -22,7 +22,7 @@ Pour chaque livre extrait, les informations suivantes sont récupérées :
 - `review_rating`
 - `image_url`
 
-Les données sont ensuite exportées dans un fichier CSV. Les images des livres sont téléchargées localement dans un dossier dédié à chaque extraction.
+Les données sont exportées dans un dossier d'extraction daté. Chaque catégorie possède son propre dossier, son propre fichier CSV et son dossier d'images.
 
 ## Fonctionnalités
 
@@ -34,8 +34,8 @@ Le programme permet de :
 - lister les catégories disponibles ;
 - lister les titres des livres d'une ou plusieurs catégories ;
 - afficher le détail d'un ou plusieurs livres ;
-- générer un fichier CSV daté ;
-- télécharger les images des livres ;
+- générer un fichier CSV distinct par catégorie ;
+- télécharger les images des livres dans le dossier de leur catégorie ;
 - tracer les actions et erreurs dans un fichier log ;
 - exécuter le programme en mode silencieux avec `--quiet`.
 
@@ -60,7 +60,7 @@ OC-PY02/
 └── tests/
 ```
 
-Les dossiers `outputs/`, `images/` et `logs/` contiennent des fichiers générés localement pendant l'exécution. Ces fichiers ne sont pas destinés à être versionnés dans Git.
+Les dossiers `outputs/`, `images` éventuels et `logs/` contiennent des fichiers générés localement pendant l'exécution. Ces fichiers ne sont pas destinés à être versionnés dans Git.
 
 ## Découpage ETL
 
@@ -98,9 +98,10 @@ In stock (22 available) -> 22
 
 Le module `load.py` sauvegarde les résultats :
 
-- écriture du fichier CSV ;
-- génération d'un nom de fichier daté ;
-- création du dossier images associé à l'extraction ;
+- création d'un dossier d'extraction daté ;
+- création d'un sous-dossier par catégorie ;
+- écriture d'un fichier CSV par catégorie ;
+- création d'un dossier `images/` dans chaque catégorie ;
 - téléchargement des images avec un nom de fichier explicite.
 
 ## Prérequis
@@ -177,6 +178,8 @@ python src/main.py --extract --categories "Fantasy,Travel"
 python src/main.py --extract --categories "Fantasy,Travel" --output "./exports"
 ```
 
+Avec cette option, le dossier d'extraction daté est créé dans `exports/` au lieu de `outputs/`.
+
 ### Mode silencieux
 
 Le mode `--quiet` ne produit aucune sortie dans le terminal. Les logs restent écrits dans le fichier log.
@@ -237,19 +240,30 @@ python src/main.py --detail "A Light in the Attic" --detail "Soulless"
 
 Lors d'une extraction, le programme génère :
 
-- un fichier CSV dans `outputs/` ;
-- un dossier d'images dans `images/` ;
+- un dossier d'extraction daté dans `outputs/` ou dans le dossier fourni avec `--output` ;
+- un sous-dossier par catégorie ;
+- un fichier CSV par catégorie ;
+- un dossier `images/` par catégorie ;
 - un fichier log dans `logs/`.
 
 Exemple :
 
 ```text
-outputs/books_extraction_20260620_183000.csv
-images/books_extraction_20260620_183000/
-logs/extraction_20260620_183000.log
+outputs/books_extraction_20260621_143000/
+├── classics/
+│   ├── classics.csv
+│   └── images/
+├── philosophy/
+│   ├── philosophy.csv
+│   └── images/
+└── fantasy/
+    ├── fantasy.csv
+    └── images/
+
+logs/extraction_20260621_143000.log
 ```
 
-Le fichier CSV et le dossier images partagent le même nom de base afin de relier facilement les données et les images d'une même extraction.
+Cette organisation facilite la création du ZIP final demandé pour le livrable : chaque catégorie contient directement son fichier CSV et les images associées.
 
 ## Gestion des erreurs
 
@@ -286,9 +300,10 @@ python src/main.py --extract --categories "Classics,Philosophy" --output "./expo
 
 Cette commande :
 
+- crée un dossier d'extraction daté dans `exports/` ;
 - extrait les livres des catégories `Classics` et `Philosophy` ;
-- génère un fichier CSV dans `exports/` ;
-- crée un dossier `exports/images/` pour les images ;
+- génère un CSV dans chaque dossier de catégorie ;
+- télécharge les images dans le dossier `images/` de chaque catégorie ;
 - écrit un fichier log dans `logs/`.
 
 ## Statut
