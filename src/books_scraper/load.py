@@ -7,7 +7,7 @@ les données extraites dans des fichiers locaux.
 Dans le découpage ETL :
 - Extract : récupération des données depuis le HTML ;
 - Transform : nettoyage et conversion des données ;
-- Load : écriture des données dans un fichier CSV et sauvegarde des images.
+- Load : écriture des données dans des fichiers CSV et sauvegarde des images.
 """
 
 import csv  # Permet d'écrire les données dans un fichier CSV.
@@ -36,8 +36,9 @@ def get_default_csv_path():
     """
     Génère un chemin CSV par défaut à partir du dossier courant.
 
-    Le fichier est placé dans le dossier outputs avec un nom contenant
-    la date et l'heure de l'extraction.
+    Cette fonction correspond à l'ancienne organisation avec un seul CSV
+    global par extraction. Elle est conservée temporairement pour
+    compatibilité avec le code existant.
 
     Exemple :
     outputs/books_extraction_20260620_153045.csv
@@ -50,6 +51,101 @@ def get_default_csv_path():
     file_name = f"books_extraction_{timestamp}.csv"
 
     return current_path / "outputs" / file_name
+
+
+def get_default_export_dir(output_dir=None):
+    """
+    Génère le dossier racine d'une extraction.
+
+    Le dossier contient ensuite un sous-dossier par catégorie.
+
+    Exemples :
+    outputs/books_extraction_20260621_143000/
+    exports/books_extraction_20260621_143000/
+
+    Args:
+        output_dir (str | Path | None): Dossier de sortie optionnel.
+
+    Returns:
+        Path: Dossier racine de l'extraction.
+    """
+    if output_dir:
+        base_dir = Path(output_dir)
+    else:
+        base_dir = Path.cwd() / "outputs"
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    extraction_name = f"books_extraction_{timestamp}"
+
+    return base_dir / extraction_name
+
+
+def get_category_slug(category_name):
+    """
+    Génère un nom technique propre à partir du nom d'une catégorie.
+
+    Exemple :
+    Historical Fiction -> historical-fiction
+
+    Args:
+        category_name (str): Nom de la catégorie.
+
+    Returns:
+        str: Nom utilisable pour un dossier ou un fichier.
+    """
+    return slugify(category_name or "unknown-category") or "unknown-category"
+
+
+def get_category_dir(export_dir, category_name):
+    """
+    Génère le dossier d'une catégorie dans le dossier d'extraction.
+
+    Exemple :
+    outputs/books_extraction_20260621_143000/fantasy/
+
+    Args:
+        export_dir (Path): Dossier racine de l'extraction.
+        category_name (str): Nom de la catégorie.
+
+    Returns:
+        Path: Dossier de la catégorie.
+    """
+    return Path(export_dir) / get_category_slug(category_name)
+
+
+def get_category_csv_path(category_dir, category_name):
+    """
+    Génère le chemin du CSV d'une catégorie.
+
+    Exemple :
+    outputs/books_extraction_20260621_143000/fantasy/fantasy.csv
+
+    Args:
+        category_dir (Path): Dossier de la catégorie.
+        category_name (str): Nom de la catégorie.
+
+    Returns:
+        Path: Chemin du fichier CSV de la catégorie.
+    """
+    category_slug = get_category_slug(category_name)
+
+    return Path(category_dir) / f"{category_slug}.csv"
+
+
+def get_category_images_dir(category_dir):
+    """
+    Génère le dossier images d'une catégorie.
+
+    Exemple :
+    outputs/books_extraction_20260621_143000/fantasy/images/
+
+    Args:
+        category_dir (Path): Dossier de la catégorie.
+
+    Returns:
+        Path: Dossier images de la catégorie.
+    """
+    return Path(category_dir) / "images"
 
 
 def save_books_to_csv(books, csv_file_path):
@@ -90,6 +186,10 @@ def save_books_to_csv(books, csv_file_path):
 def get_images_dir_from_csv_path(csv_file_path):
     """
     Génère un dossier images à partir du nom du fichier CSV.
+
+    Cette fonction correspond à l'ancienne organisation avec un seul CSV
+    global par extraction. Elle est conservée temporairement pour
+    compatibilité avec le code existant.
 
     Exemple :
     outputs/books_extraction_20260620_183000.csv
