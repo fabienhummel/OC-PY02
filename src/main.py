@@ -158,7 +158,13 @@ def choose_interactive_categories(categories):
     return {name: categories[name] for name in selected_names}
 
 
-def resolve_categories(categories, categories_argument, default_all=False):
+def resolve_categories(
+    categories,
+    categories_argument,
+    default_all=False,
+    logger=None,
+    quiet=False,
+):
     """Résout l'argument --categories en dictionnaire de catégories."""
     if not categories_argument:
         if default_all:
@@ -182,7 +188,11 @@ def resolve_categories(categories, categories_argument, default_all=False):
                 break
 
         if not found:
-            print(f"Catégorie inconnue : {requested_name}")
+            if not quiet:
+                print(f"Catégorie inconnue : {requested_name}")
+
+            if logger:
+                logger.warning("Catégorie inconnue : %s", requested_name)
 
     return selected_categories
 
@@ -220,6 +230,7 @@ def list_books(categories, categories_argument, logger):
     selected_categories = resolve_categories(
         categories,
         categories_argument,
+        logger=logger,
     )
 
     if not selected_categories:
@@ -263,6 +274,7 @@ def show_details(categories, titles, categories_argument, logger):
         categories,
         categories_argument,
         default_all=True,
+        logger=logger,
     )
 
     requested_titles = {title.casefold(): title for title in titles}
@@ -460,6 +472,8 @@ def run_cli_mode(args, categories, logger, log_file):
         selected_categories = resolve_categories(
             categories,
             args.categories,
+            logger=logger,
+            quiet=args.quiet,
         )
 
         run_extraction(
