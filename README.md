@@ -53,9 +53,6 @@ OC-PY02/
 │       ├── transform.py
 │       ├── load.py
 │       └── logger_config.py
-├── data/
-│   ├── raw/
-│   └── processed/
 ├── docs/
 ├── images/
 ├── logs/
