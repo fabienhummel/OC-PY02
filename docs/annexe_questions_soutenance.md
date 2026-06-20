@@ -11,7 +11,7 @@ Cette annexe regroupe des questions susceptibles d'être posées pendant la sout
 
 | Question | Réponse possible |
 |---|---|
-| Quel est l'objectif du projet ? | Automatiser l'extraction de données de livres depuis Books to Scrape, produire un CSV et récupérer les images associées. |
+| Quel est l'objectif du projet ? | Automatiser l'extraction de données de livres depuis Books to Scrape, produire des CSV par catégorie et récupérer les images associées. |
 | Quels sont les livrables attendus ? | Un repository GitHub, un fichier ZIP contenant les données générées et les images, et un mail PDF expliquant le pipeline ETL. |
 | Pourquoi utiliser Books to Scrape ? | C'est un site fictif conçu pour s'entraîner au scraping web. |
 | Pourquoi les données ne sont-elles pas dans GitHub ? | Les CSV, images et logs sont des fichiers générés. Ils doivent être fournis séparément dans le ZIP. |
@@ -23,7 +23,7 @@ Cette annexe regroupe des questions susceptibles d'être posées pendant la sout
 | Qu'est-ce qu'un pipeline ETL ? | ETL signifie Extract, Transform, Load : extraire les données, les transformer, puis les charger ou les sauvegarder. |
 | Où se trouve la partie Extract ? | Dans `extract.py`, qui récupère les pages HTML et les informations des livres. |
 | Où se trouve la partie Transform ? | Dans `transform.py`, qui nettoie et convertit certaines données. |
-| Où se trouve la partie Load ? | Dans `load.py`, qui écrit le CSV et prépare les images. |
+| Où se trouve la partie Load ? | Dans `load.py`, qui prépare les dossiers de sortie, les CSV par catégorie et les dossiers d'images. |
 | Pourquoi séparer ces étapes ? | Pour rendre le code plus lisible, plus maintenable et plus facile à expliquer. |
 
 ## Questions sur l'extraction
@@ -51,10 +51,11 @@ Cette annexe regroupe des questions susceptibles d'être posées pendant la sout
 
 | Question | Réponse possible |
 |---|---|
-| Comment le CSV est-il généré ? | Avec le module standard `csv` et un dictionnaire de champs fixes. |
-| Où sont stockées les images ? | Dans un sous-dossier de `images/` associé à l'extraction. |
+| Comment le CSV est-il généré ? | Avec le module standard `csv`, un dictionnaire de champs fixes et une sauvegarde par catégorie. |
+| Pourquoi un CSV par catégorie ? | C'est demandé dans le cahier des charges et cela rend les données plus simples à exploiter. |
+| Où sont stockées les images ? | Dans le dossier `images/` de chaque catégorie, dans le dossier d'extraction daté. |
 | À quoi servent les logs ? | À tracer l'exécution et les erreurs sans surcharger le terminal. |
-| Que contient le fichier ZIP final ? | Le CSV généré et les images extraites, organisés de manière simple. |
+| Que contient le fichier ZIP final ? | Le dossier d'extraction généré, avec un sous-dossier par catégorie contenant le CSV et les images. |
 
 ## Questions sur l'environnement Python
 
@@ -79,7 +80,7 @@ Cette annexe regroupe des questions susceptibles d'être posées pendant la sout
 
 | Question | Réponse possible |
 |---|---|
-| Que pourrais-tu améliorer ? | Ajouter des tests, une base de données, une planification automatique et un suivi des prix dans le temps. |
+| Que pourrais-tu améliorer ? | Ajouter des tests automatisés, une base de données, une planification automatique et un suivi des prix dans le temps. |
 | Comment faire un vrai suivi de prix ? | Exécuter le script régulièrement et stocker les résultats avec une date d'extraction. |
 | Comment industrialiser le pipeline ? | Ajouter une planification, une base de données, des logs centralisés et éventuellement des alertes. |
 
@@ -90,7 +91,7 @@ Cette annexe regroupe des questions susceptibles d'être posées pendant la sout
 3. Comment récupères-tu les données depuis le HTML ?
 4. Comment gères-tu les catégories et la pagination ?
 5. Comment transformes-tu la note et la disponibilité ?
-6. Comment génères-tu le CSV ?
+6. Comment génères-tu un CSV par catégorie ?
 7. Pourquoi les données et images ne sont-elles pas dans GitHub ?
 8. Comment installer et lancer ton projet depuis zéro ?
 9. À quoi sert `requirements.txt` ?
