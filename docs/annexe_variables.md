@@ -116,5 +116,7 @@ Structure de `image_summary` :
 | `args.extract` | `bool` | Indique si le mode extraction est demandé. |
 | `args.interactive` | `bool` | Indique si le mode interactif est demandé. |
 | `args.list_mode` | `str` ou `None` | Mode de liste demandé : catégories ou livres. |
-| `args.detail` | `list` ou `None` | Liste des titres demandés avec `--detail`. |
+| `args.detail` | `list` ou `None` | Titres demandés avec `--detail`. Avec `nargs="+"` et `action="append"`, la valeur brute est une liste de listes. |
 | `args.quiet` | `bool` | Indique si le mode silencieux est activé. |
+
+Dans `run_cli_mode()`, `args.detail` est aplati dans une liste simple appelée `detail_titles` avant l'appel à `show_details()`.
