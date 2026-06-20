@@ -16,7 +16,7 @@ Dans ce projet, les UAT doivent permettre à Sam, ou à un utilisateur testeur, 
 
 - exécuter le code depuis le repository GitHub ;
 - générer les données attendues ;
-- produire les fichiers CSV demandés ;
+- produire un fichier CSV distinct par catégorie ;
 - télécharger les images associées ;
 - organiser les livrables de manière exploitable ;
 - comprendre le rôle du pipeline ETL.
@@ -32,7 +32,7 @@ Les UAT vérifient plutôt que la solution répond au besoin utilisateur et au c
 | Type de test | Question principale | Exemple dans le projet |
 |---|---|---|
 | Test technique | Est-ce que le code fonctionne correctement ? | Vérifier que `--detail` accepte plusieurs titres. |
-| Test UAT | Est-ce que le livrable répond au besoin de Sam ? | Vérifier que les données demandées sont bien générées et exploitables. |
+| Test UAT | Est-ce que le livrable répond au besoin de Sam ? | Vérifier qu'un CSV est généré pour chaque catégorie. |
 
 Un test UAT ne cherche donc pas à tester toutes les options internes du programme. Il se concentre sur les scénarios utiles pour valider le besoin métier.
 
@@ -85,7 +85,8 @@ Les UAT doivent couvrir uniquement les exigences demandées dans le projet.
 - présence du `README.md` et du `requirements.txt` ;
 - absence des données générées dans le repository ;
 - génération des données demandées ;
-- présence des champs imposés dans le CSV ;
+- présence des champs imposés dans les CSV ;
+- génération d'un CSV distinct par catégorie ;
 - téléchargement des images ;
 - organisation du ZIP final ;
 - explication du pipeline ETL dans un mail PDF.
@@ -113,9 +114,10 @@ Le cahier des charges demande notamment :
 | Inclure un `requirements.txt` | Vérifier que les dépendances peuvent être installées. |
 | Inclure un `README.md` complet | Vérifier qu'un utilisateur peut exécuter le projet avec les instructions. |
 | Ne pas inclure les données et images dans GitHub | Vérifier que les fichiers générés ne sont pas versionnés. |
-| Générer les données extraites | Vérifier que le CSV est produit après exécution. |
-| Extraire les champs demandés | Vérifier les colonnes du CSV. |
-| Télécharger les images | Vérifier que les images sont présentes dans le dossier généré. |
+| Générer les données extraites | Vérifier que les dossiers d'extraction sont produits après exécution. |
+| Extraire les champs demandés | Vérifier les colonnes des CSV. |
+| Générer un CSV distinct par catégorie | Vérifier que chaque catégorie possède son propre fichier CSV. |
+| Télécharger les images | Vérifier que les images sont présentes dans le dossier de leur catégorie. |
 | Fournir un ZIP des données générées | Vérifier l'organisation du ZIP final. |
 | Expliquer le pipeline ETL | Vérifier le mail PDF destiné à Sam. |
 
@@ -159,9 +161,9 @@ Une anomalie UAT doit être décrite simplement, sans entrer inutilement dans le
 |---|---|
 | ID du test | UAT-08 |
 | Résultat attendu | Un CSV distinct doit être généré pour chaque catégorie. |
-| Résultat obtenu | Un seul CSV global est généré pour plusieurs catégories. |
+| Résultat obtenu | Le CSV d'une catégorie est absent ou mal placé. |
 | Impact | Écart avec le cahier des charges. |
-| Décision | Correction à planifier. |
+| Décision | Correction à planifier, puis re-test ciblé. |
 
 ---
 
@@ -170,12 +172,13 @@ Une anomalie UAT doit être décrite simplement, sans entrer inutilement dans le
 ```mermaid
 flowchart LR
     A[Sam demande les données] --> B[Le testeur lance l'extraction]
-    B --> C[Le programme génère les CSV]
-    C --> D[Le programme télécharge les images]
-    D --> E[Le testeur vérifie le ZIP]
-    E --> F{Livrable exploitable ?}
-    F -->|Oui| G[Validation UAT]
-    F -->|Non| H[Écart à corriger]
+    B --> C[Le programme crée un dossier d'extraction]
+    C --> D[Un dossier et un CSV sont générés par catégorie]
+    D --> E[Les images sont placées dans chaque catégorie]
+    E --> F[Le testeur vérifie le ZIP]
+    F --> G{Livrable exploitable ?}
+    G -->|Oui| H[Validation UAT]
+    G -->|Non| I[Écart à corriger]
 ```
 
 Dans ce projet, un test UAT ne cherche pas à vérifier chaque ligne de code. Il vérifie que le résultat obtenu est exploitable par Sam.
@@ -192,7 +195,7 @@ Dans ce projet, un test UAT ne cherche pas à vérifier chaque ligne de code. Il
 | Accepté avec réserve | Le livrable est utilisable, mais certains points mineurs doivent être corrigés. |
 | Refusé | Un ou plusieurs écarts bloquants empêchent l'acceptation du livrable. |
 
-Pour le projet OC-PY02, un point peut nécessiter une attention particulière : la génération d'un **CSV distinct par catégorie**, si l'exigence est appliquée strictement.
+Pour le projet OC-PY02, le point relatif au **CSV distinct par catégorie** est couvert par le test UAT-08.
 
 ---
 
