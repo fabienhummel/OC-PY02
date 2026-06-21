@@ -90,7 +90,7 @@ Le terminal doit afficher l'aide du programme avec les options disponibles, nota
 
 ### Statut
 
-- [x] Réussi
+- [x] ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
