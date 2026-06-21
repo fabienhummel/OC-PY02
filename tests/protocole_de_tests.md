@@ -90,7 +90,7 @@ Le terminal doit afficher l'aide du programme avec les options disponibles, nota
 
 ### Statut
 
-- [x] ✅ Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
@@ -98,7 +98,7 @@ Le terminal doit afficher l'aide du programme avec les options disponibles, nota
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P03.png"
-       alt="Capture d’écran de l'affichage de l'aide"
+       alt="capture d'écran de l'aide affichée"
        width="80%" />
 </p>
 ---
@@ -132,13 +132,17 @@ La catégorie globale `Books` ne doit pas apparaître dans la liste.
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran de la liste des catégories.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P04.png"
+       alt="capture d'écran de la liste des catégories"
+       width="80%" />
+</p>
 ---
 
 ## 5. Test 03 — Liste des livres d'une catégorie
@@ -159,13 +163,17 @@ Le terminal doit afficher uniquement les titres des livres de la catégorie `Fan
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran de la liste des livres de la catégorie Fantasy.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P05.png"
+       alt="capture d'écran de la liste des livres de la catégorie Fantasy"
+       width="80%" />
+</p>
 ---
 
 ## 6. Test 04 — Détail d'un livre
@@ -196,13 +204,17 @@ Le terminal doit afficher les informations du livre, notamment :
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran du détail du livre A Light in the Attic.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P06.png"
+       alt="capture d'écran du détail du livre A Light in the Attic"
+       width="80%" />
+</p>
 ---
 
 ## 7. Test 05 — Détail de plusieurs livres avec la nouvelle syntaxe
@@ -214,7 +226,7 @@ Vérifier que `--detail` accepte plusieurs titres après une seule option.
 ### Commande à lancer
 
 ```bash
-python src/main.py --detail "A Light in the Attic" "Soulless"
+python src/main.py --detail "A Light in the Attic" "Soumission"
 ```
 
 ### Résultat attendu
@@ -223,13 +235,17 @@ Le terminal doit afficher successivement les détails des deux livres.
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran du détail des deux livres avec la nouvelle syntaxe --detail.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P07_2.png"
+       alt="capture d'écran du détail des deux livres avec la nouvelle syntaxe --detail"
+       width="80%" />
+</p>
 ---
 
 ## 8. Test 06 — Compatibilité avec l'ancienne syntaxe de `--detail`
@@ -241,7 +257,7 @@ Vérifier que l'ancienne syntaxe reste fonctionnelle.
 ### Commande à lancer
 
 ```bash
-python src/main.py --detail "A Light in the Attic" --detail "Soulless"
+python src/main.py --detail "The Requiem Red" --detail "Rip it Up and Start Again"
 ```
 
 ### Résultat attendu
@@ -250,13 +266,17 @@ Le terminal doit afficher les détails des deux livres.
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran du détail des deux livres avec l'ancienne syntaxe --detail répétée.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P07_2.png"
+       alt="capture d'écran du détail des deux livres avec l'ancienne syntaxe --detail répétée"
+       width="80%" />
+</p>
 ---
 
 ## 9. Test 07 — Titre contenant une virgule
@@ -268,7 +288,7 @@ Vérifier que les titres contenant une virgule sont correctement traités lorsqu
 ### Commande à lancer
 
 ```bash
-python src/main.py --detail "Scott Pilgrim, Volume 1: Scott Pilgrim's Precious Little Life"
+python src/main.py --detail "In a Dark, Dark Wood"
 ```
 
 ### Résultat attendu
@@ -277,13 +297,17 @@ Le programme doit rechercher le titre complet, sans découper le titre au niveau
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran du test avec un titre contenant une virgule.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P09_2.png"
+       alt="capture d'écran du test avec un titre contenant une virgule"
+       width="80%" />
+</p>
 ---
 
 ## 10. Test 08 — Catégorie inexistante
@@ -306,13 +330,17 @@ Le programme ne doit pas se fermer avec une erreur Python non maîtrisée.
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran du test avec une catégorie inexistante.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P10.png"
+       alt="capture d'écran du test avec une catégorie inexistante"
+       width="80%" />
+</p>
 ---
 
 ## 11. Test 09 — Extraction d'une catégorie
@@ -341,13 +369,17 @@ Le programme doit :
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran de l'extraction de la catégorie Fantasy et du résumé final.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P11.png"
+       alt="capture d'écran de l'extraction de la catégorie Fantasy et du résumé final"
+       width="80%" />
+</p>
 ---
 
 ## 12. Test 10 — Extraction de plusieurs catégories
@@ -380,13 +412,17 @@ Le résumé final doit afficher le nombre de livres extraits par catégorie et l
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran de l'extraction des catégories Classics et Philosophy.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P12.png"
+       alt="capture d'écran de l'extraction des catégories Classics et Philosophy"
+       width="80%" />
+</p>
 ---
 
 ## 13. Test 11 — Utilisation d'un dossier de sortie personnalisé
@@ -416,13 +452,17 @@ Le fichier log doit rester dans le dossier `logs/`.
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran du dossier exports_test et du résumé d'extraction.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P13_2.png"
+       alt="capture d'écran du dossier exports_test et du résumé d'extraction"
+       width="80%" />
+</p>
 ---
 
 ## 14. Test 12 — Mode silencieux
@@ -434,7 +474,7 @@ Vérifier que le mode `--quiet` limite les sorties terminal tout en générant l
 ### Commande à lancer
 
 ```bash
-python src/main.py --extract --categories "Fantasy" --quiet
+python src/main.py --extract --categories "Mystery" --quiet
 ```
 
 ### Résultat attendu
@@ -450,13 +490,26 @@ Les fichiers doivent tout de même être générés :
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran du terminal après exécution en mode quiet et des fichiers générés.
 </div>
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P14_1.png"
+       alt="capture d'écran du terminal après exécution en mode quiet"
+       width="80%" />
+  <br>
+  <em>Exécution en mode quiet</em>
+  <br><br>
 
+  <img src="protocole_de_tests_screenshot/Screenshot_P14_2.png"
+       alt="capture d'écran du terminal des fichiers générés"
+       width="80%" />
+  <br>
+  <em>Fichiers générés après extraction</em>
+</p>
 ---
 
 ## 15. Test 13 — Vérification des fichiers CSV
@@ -465,7 +518,7 @@ Les fichiers doivent tout de même être générés :
 
 Vérifier que les CSV générés contiennent les colonnes attendues.
 
-### Commande à lancer
+### Commande à lancer en Bash/Linux
 
 ```bash
 python - <<'PY'
@@ -481,6 +534,22 @@ for csv_path in csv_files[-3:]:
         print(reader.fieldnames)
         print()
 PY
+```
+### Commande à lancer en Powershell
+```powershell
+@'
+import csv
+from pathlib import Path
+
+csv_files = sorted(Path("outputs").glob("books_extraction_*/**/*.csv"))
+
+for csv_path in csv_files[-3:]:
+    with csv_path.open(encoding="utf-8-sig", newline="") as csv_file:
+        reader = csv.DictReader(csv_file)
+        print(csv_path)
+        print(reader.fieldnames)
+        print()
+'@ | python
 ```
 
 ### Résultat attendu
@@ -502,13 +571,17 @@ image_url
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran des colonnes affichées depuis les CSV générés.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P15.png"
+       alt="capture d'écran des colonnes affichées depuis les CSV générés"
+       width="80%" />
+</p>
 ---
 
 ## 16. Test 14 — Vérification des images
@@ -523,6 +596,13 @@ Vérifier que les images sont bien téléchargées dans les dossiers de catégor
 find outputs -path "*/images/*" -type f | head
 ```
 
+```powershell
+Get-ChildItem -Path outputs -Recurse -File |
+    Where-Object { $_.FullName -like "*\images\*" } |
+    Select-Object -First 10 |
+    ForEach-Object { $_.FullName }
+```
+
 ### Résultat attendu
 
 Le terminal doit afficher plusieurs fichiers images situés dans des dossiers de ce type :
@@ -535,13 +615,17 @@ Les noms doivent être lisibles et contenir des éléments comme la catégorie, 
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran de la liste des images téléchargées.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P16.png"
+       alt="capture d'écran de la liste des images téléchargées"
+       width="80%" />
+</p>
 ---
 
 ## 17. Test 15 — Vérification des logs
@@ -555,6 +639,11 @@ Vérifier que le fichier log est bien généré.
 ```bash
 ls -lt logs | head
 ```
+```powershell
+Get-ChildItem -Path logs |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -First 10 Name, LastWriteTime, Length
+```
 
 ### Résultat attendu
 
@@ -566,13 +655,17 @@ extraction_YYYYMMDD_HHMMSS.log
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran de la liste des fichiers logs.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P17.png"
+       alt="capture d'écran de la liste des fichiers logs"
+       width="80%" />
+</p>
 ---
 
 ## 18. Test 16 — Vérification que les fichiers générés ne sont pas versionnés
@@ -624,17 +717,17 @@ Les dossiers `outputs/` et `logs/` peuvent être conservés localement le temps 
 
 | Point de contrôle | Statut |
 |---|---|
-| L'aide s'affiche correctement | [ ] OK |
-| Les catégories sont listées | [ ] OK |
-| Les livres d'une catégorie sont listés | [ ] OK |
-| Le détail d'un livre fonctionne | [ ] OK |
-| Le détail de plusieurs livres fonctionne | [ ] OK |
-| L'extraction d'une catégorie fonctionne | [ ] OK |
-| L'extraction de plusieurs catégories fonctionne | [ ] OK |
-| Un CSV est généré par catégorie | [ ] OK |
-| Les images sont téléchargées dans le dossier de leur catégorie | [ ] OK |
-| Les logs sont générés | [ ] OK |
-| Les fichiers générés ne sont pas versionnés | [ ] OK |
+| L'aide s'affiche correctement | ✅ OK |
+| Les catégories sont listées | ✅ OK |
+| Les livres d'une catégorie sont listés | ✅ OK |
+| Le détail d'un livre fonctionne | ✅ OK |
+| Le détail de plusieurs livres fonctionne | ✅ OK |
+| L'extraction d'une catégorie fonctionne | ✅ OK |
+| L'extraction de plusieurs catégories fonctionne | ✅ OK |
+| Un CSV est généré par catégorie | ✅ OK |
+| Les images sont téléchargées dans le dossier de leur catégorie | ✅ OK |
+| Les logs sont générés | ✅ OK |
+| Les fichiers générés ne sont pas versionnés | ✅ OK |
 
 ---
 
