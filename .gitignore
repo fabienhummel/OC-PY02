@@ -104,7 +104,7 @@ ipython_config.py
 #   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
 #   This is especially recommended for binary packages to ensure reproducibility, and is more
 #   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
+#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file
 # poetry.lock
 # poetry.toml
 
@@ -238,6 +238,10 @@ images/*
 **/*.jpeg
 **/*.png
 **/*.webp
+
+# Keep screenshots used in test documentation
+!tests/protocole_de_tests_screenshot/
+!tests/protocole_de_tests_screenshot/**
 
 # IDE settings
 .idea/
