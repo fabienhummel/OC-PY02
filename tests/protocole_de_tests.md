@@ -688,13 +688,17 @@ Si certains fichiers apparaissent, il faut vérifier le fichier `.gitignore`.
 
 ### Statut
 
-- [ ] Réussi
+- ✅ Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran du git status après génération des fichiers.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P18_0.png"
+       alt="capture d'écran du git status après génération des fichiers"
+       width="80%" />
+</p>
 ---
 
 ## 19. Nettoyage après les tests
