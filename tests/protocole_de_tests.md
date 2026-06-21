@@ -56,6 +56,11 @@ git status
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran du résultat de git status avant les tests.
 </div>
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P02.png"
+       alt="Capture d’écran du résultat de git status"
+       width="80%" />
+</p>
 
 ---
 
@@ -85,13 +90,17 @@ Le terminal doit afficher l'aide du programme avec les options disponibles, nota
 
 ### Statut
 
-- [ ] Réussi
+- [x] Réussi
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
 🔴 À COLLER ICI : capture d'écran de l'aide affichée.
 </div>
-
+<p align="center">
+  <img src="protocole_de_tests_screenshot/Screenshot_P03.png"
+       alt="Capture d’écran de l'affichage de l'aide"
+       width="80%" />
+</p>
 ---
 
 ## 4. Test 02 — Liste des catégories
