@@ -54,7 +54,7 @@ git status
 - aucun fichier utile ne doit être en attente de commit avant le démarrage des tests.
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran du résultat de git status avant les tests.
+🔴 ### Résultat obtenu : capture d'écran du résultat de git status avant les tests.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P02.png"
@@ -94,7 +94,7 @@ Le terminal doit afficher l'aide du programme avec les options disponibles, nota
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran de l'aide affichée.
+🔴 ### Résultat obtenu : capture d'écran de l'aide affichée.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P03.png"
@@ -136,7 +136,7 @@ La catégorie globale `Books` ne doit pas apparaître dans la liste.
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran de la liste des catégories.
+🔴 ### Résultat obtenu : capture d'écran de la liste des catégories.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P04.png"
@@ -167,7 +167,7 @@ Le terminal doit afficher uniquement les titres des livres de la catégorie `Fan
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran de la liste des livres de la catégorie Fantasy.
+🔴 ### Résultat obtenu : capture d'écran de la liste des livres de la catégorie Fantasy.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P05.png"
@@ -208,7 +208,7 @@ Le terminal doit afficher les informations du livre, notamment :
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran du détail du livre A Light in the Attic.
+🔴 ### Résultat obtenu : capture d'écran du détail du livre A Light in the Attic.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P06.png"
@@ -239,7 +239,7 @@ Le terminal doit afficher successivement les détails des deux livres.
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran du détail des deux livres avec la nouvelle syntaxe --detail.
+🔴 ### Résultat obtenu : capture d'écran du détail des deux livres avec la nouvelle syntaxe --detail.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P07_2.png"
@@ -270,7 +270,7 @@ Le terminal doit afficher les détails des deux livres.
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran du détail des deux livres avec l'ancienne syntaxe --detail répétée.
+🔴 ### Résultat obtenu : capture d'écran du détail des deux livres avec l'ancienne syntaxe --detail répétée.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P07_2.png"
@@ -301,7 +301,7 @@ Le programme doit rechercher le titre complet, sans découper le titre au niveau
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran du test avec un titre contenant une virgule.
+🔴 ### Résultat obtenu : capture d'écran du test avec un titre contenant une virgule.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P09_2.png"
@@ -334,7 +334,7 @@ Le programme ne doit pas se fermer avec une erreur Python non maîtrisée.
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran du test avec une catégorie inexistante.
+🔴 ### Résultat obtenu : capture d'écran du test avec une catégorie inexistante.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P10.png"
@@ -373,7 +373,7 @@ Le programme doit :
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran de l'extraction de la catégorie Fantasy et du résumé final.
+🔴 ### Résultat obtenu : capture d'écran de l'extraction de la catégorie Fantasy et du résumé final.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P11.png"
@@ -416,7 +416,7 @@ Le résumé final doit afficher le nombre de livres extraits par catégorie et l
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran de l'extraction des catégories Classics et Philosophy.
+🔴 ### Résultat obtenu: capture d'écran de l'extraction des catégories Classics et Philosophy.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P12.png"
@@ -456,7 +456,7 @@ Le fichier log doit rester dans le dossier `logs/`.
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran du dossier exports_test et du résumé d'extraction.
+🔴 ### Résultat obtenu : capture d'écran du dossier exports_test et du résumé d'extraction.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P13_2.png"
@@ -494,7 +494,7 @@ Les fichiers doivent tout de même être générés :
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran du terminal après exécution en mode quiet et des fichiers générés.
+🔴 ### Résultat obtenu : capture d'écran du terminal après exécution en mode quiet et des fichiers générés.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P14_1.png"
@@ -575,7 +575,7 @@ image_url
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran des colonnes affichées depuis les CSV générés.
+🔴 ### Résultat obtenu : capture d'écran des colonnes affichées depuis les CSV générés.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P15.png"
@@ -619,7 +619,7 @@ Les noms doivent être lisibles et contenir des éléments comme la catégorie, 
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran de la liste des images téléchargées.
+🔴 ### Résultat obtenu : capture d'écran de la liste des images téléchargées.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P16.png"
@@ -659,7 +659,7 @@ extraction_YYYYMMDD_HHMMSS.log
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran de la liste des fichiers logs.
+🔴 ### Résultat obtenu: capture d'écran de la liste des fichiers logs.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P17.png"
@@ -692,7 +692,7 @@ Si certains fichiers apparaissent, il faut vérifier le fichier `.gitignore`.
 - [ ] Échec
 
 <div style="color:red; font-weight:bold; border:1px dashed red; padding:10px;">
-🔴 À COLLER ICI : capture d'écran du git status après génération des fichiers.
+🔴 ### Résultat obtenu: capture d'écran du git status après génération des fichiers.
 </div>
 <p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P18_0.png"
