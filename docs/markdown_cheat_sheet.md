@@ -18,25 +18,27 @@
 - [8. Code inline](#8-code-inline)
 - [9. Blocs de code](#9-blocs-de-code)
 - [10. Commandes terminal](#10-commandes-terminal)
-- [11. Tableaux](#11-tableaux)
-- [12. Liens](#12-liens)
-- [13. Images](#13-images)
-- [14. Images centrées avec HTML](#14-images-centrées-avec-html)
-- [15. Séparateurs](#15-séparateurs)
-- [16. Échappement des caractères spéciaux](#16-échappement-des-caractères-spéciaux)
-- [17. Notes, avertissements et blocs d'information GitHub](#17-notes-avertissements-et-blocs-dinformation-github)
-- [18. Sections repliables](#18-sections-repliables)
-- [19. Sommaires et ancres](#19-sommaires-et-ancres)
-- [20. Tableaux de documentation technique](#20-tableaux-de-documentation-technique)
-- [21. Documentation de fonctions Python](#21-documentation-de-fonctions-python)
-- [22. Documentation de projet Python](#22-documentation-de-projet-python)
-- [23. Mermaid : diagrammes dans GitHub](#23-mermaid--diagrammes-dans-github)
-- [24. Expressions mathématiques](#24-expressions-mathématiques)
-- [25. HTML utilisable dans Markdown](#25-html-utilisable-dans-markdown)
-- [26. CSS et JavaScript : limites sur GitHub](#26-css-et-javascript--limites-sur-github)
-- [27. Exemple GitHub Pages avec HTML, CSS et JavaScript](#27-exemple-github-pages-avec-html-css-et-javascript)
-- [28. Modèles prêts à copier](#28-modèles-prêts-à-copier)
-- [29. Bonnes pratiques](#29-bonnes-pratiques)
+- [11. Arborescences de dossiers et fichiers](#11-arborescences-de-dossiers-et-fichiers)
+- [12. Tableaux](#12-tableaux)
+- [13. Liens](#13-liens)
+- [14. Images](#14-images)
+- [15. Images centrées avec HTML](#15-images-centrées-avec-html)
+- [16. Séparateurs](#16-séparateurs)
+- [17. Échappement des caractères spéciaux](#17-échappement-des-caractères-spéciaux)
+- [18. Notes, avertissements et blocs d'information GitHub](#18-notes-avertissements-et-blocs-dinformation-github)
+- [19. Sections repliables](#19-sections-repliables)
+- [20. Sommaires et ancres](#20-sommaires-et-ancres)
+- [21. Tableaux de documentation technique](#21-tableaux-de-documentation-technique)
+- [22. Documentation de fonctions Python](#22-documentation-de-fonctions-python)
+- [23. Documentation de projet Python](#23-documentation-de-projet-python)
+- [24. Mermaid : diagrammes dans GitHub](#24-mermaid--diagrammes-dans-github)
+- [25. Expressions mathématiques](#25-expressions-mathématiques)
+- [26. HTML utilisable dans Markdown](#26-html-utilisable-dans-markdown)
+- [27. CSS et JavaScript : limites sur GitHub](#27-css-et-javascript--limites-sur-github)
+- [28. Exemple GitHub Pages avec HTML, CSS et JavaScript](#28-exemple-github-pages-avec-html-css-et-javascript)
+- [29. Modèles prêts à copier](#29-modèles-prêts-à-copier)
+- [30. Bonnes pratiques](#30-bonnes-pratiques)
+- [Mini-référence rapide](#mini-référence-rapide)
 
 ---
 
@@ -492,7 +494,273 @@ Python 3.12.4
 
 ---
 
-## 11. Tableaux
+## 11. Arborescences de dossiers et fichiers
+
+Une arborescence permet de représenter visuellement la structure d'un projet : dossiers, sous-dossiers et fichiers.
+
+En Markdown, il n'existe pas de syntaxe spéciale pour les arborescences. La bonne méthode consiste à écrire l'arborescence dans un bloc de code `text`.
+
+### Modèle de base
+
+### Code Markdown
+
+````md
+```text
+mon_projet/
+├── dossier_1/
+│   ├── fichier_1.py
+│   └── fichier_2.py
+├── dossier_2/
+│   └── fichier_3.md
+└── README.md
+```
+````
+
+### Résultat
+
+```text
+mon_projet/
+├── dossier_1/
+│   ├── fichier_1.py
+│   └── fichier_2.py
+├── dossier_2/
+│   └── fichier_3.md
+└── README.md
+```
+
+### Signification des caractères
+
+| Caractère | Signification |
+|---|---|
+| `├──` | Élément suivi par d'autres éléments au même niveau |
+| `└──` | Dernier élément du niveau |
+| `│` | Ligne verticale indiquant que l'arborescence continue |
+| `    ` | Espaces utilisés pour aligner les niveaux |
+| `/` | Indique généralement un dossier |
+
+### Exemple simple pour un projet Python
+
+### Code Markdown
+
+````md
+```text
+projet_python/
+├── README.md
+├── requirements.txt
+├── main.py
+├── src/
+│   ├── __init__.py
+│   ├── extract.py
+│   ├── transform.py
+│   └── load.py
+├── tests/
+│   ├── test_extract.py
+│   └── test_load.py
+└── docs/
+    └── notes.md
+```
+````
+
+### Résultat
+
+```text
+projet_python/
+├── README.md
+├── requirements.txt
+├── main.py
+├── src/
+│   ├── __init__.py
+│   ├── extract.py
+│   ├── transform.py
+│   └── load.py
+├── tests/
+│   ├── test_extract.py
+│   └── test_load.py
+└── docs/
+    └── notes.md
+```
+
+### Exemple avec plusieurs niveaux
+
+### Code Markdown
+
+````md
+```text
+OC-PY02/
+├── docs/
+│   ├── markdown_cheat_sheet.md
+│   └── manuel_UAT.md
+├── outputs/
+│   ├── travel/
+│   │   ├── travel.csv
+│   │   └── images/
+│   │       ├── book_001.jpg
+│   │       └── book_002.jpg
+│   └── mystery/
+│       ├── mystery.csv
+│       └── images/
+├── src/
+│   ├── __init__.py
+│   ├── extract.py
+│   ├── transform.py
+│   └── load.py
+├── tests/
+│   └── test_load.py
+├── main.py
+├── requirements.txt
+└── README.md
+```
+````
+
+### Résultat
+
+```text
+OC-PY02/
+├── docs/
+│   ├── markdown_cheat_sheet.md
+│   └── manuel_UAT.md
+├── outputs/
+│   ├── travel/
+│   │   ├── travel.csv
+│   │   └── images/
+│   │       ├── book_001.jpg
+│   │       └── book_002.jpg
+│   └── mystery/
+│       ├── mystery.csv
+│       └── images/
+├── src/
+│   ├── __init__.py
+│   ├── extract.py
+│   ├── transform.py
+│   └── load.py
+├── tests/
+│   └── test_load.py
+├── main.py
+├── requirements.txt
+└── README.md
+```
+
+### Variante ASCII simple
+
+Les caractères `├──`, `└──` et `│` sont des caractères Unicode. Ils sont bien acceptés par GitHub.
+
+Pour une compatibilité maximale, on peut aussi utiliser une version ASCII simple.
+
+### Code Markdown
+
+````md
+```text
+projet/
+|-- docs/
+|   `-- notes.md
+|-- src/
+|   |-- main.py
+|   `-- load.py
+`-- README.md
+```
+````
+
+### Résultat
+
+```text
+projet/
+|-- docs/
+|   `-- notes.md
+|-- src/
+|   |-- main.py
+|   `-- load.py
+`-- README.md
+```
+
+### Variante très simple avec des tirets
+
+### Code Markdown
+
+~~~md
+- projet/
+  - docs/
+    - notes.md
+  - src/
+    - main.py
+    - load.py
+  - README.md
+~~~
+
+### Résultat
+
+- projet/
+  - docs/
+    - notes.md
+  - src/
+    - main.py
+    - load.py
+  - README.md
+
+### Générer automatiquement une arborescence avec `tree`
+
+Sur macOS ou Linux, la commande `tree` permet de générer une arborescence automatiquement.
+
+```bash
+tree
+```
+
+Limiter la profondeur d'affichage :
+
+```bash
+tree -L 3
+```
+
+Ignorer certains dossiers :
+
+```bash
+tree -I ".venv|__pycache__|.git"
+```
+
+Exemple complet :
+
+```bash
+tree -L 3 -I ".venv|__pycache__|.git"
+```
+
+Ensuite, il suffit de copier le résultat dans un bloc Markdown :
+
+````md
+```text
+coller ici le résultat de la commande tree
+```
+````
+
+### Installation de `tree`
+
+macOS avec Homebrew :
+
+```bash
+brew install tree
+```
+
+Ubuntu / Debian :
+
+```bash
+sudo apt install tree
+```
+
+Windows PowerShell peut utiliser la commande intégrée suivante :
+
+```powershell
+tree /F
+```
+
+### Bonnes pratiques pour les arborescences
+
+- Ajouter `/` à la fin des dossiers.
+- Ne pas afficher trop de niveaux si ce n'est pas nécessaire.
+- Éviter d'afficher `.venv/`, `.git/`, `__pycache__/` ou les fichiers temporaires.
+- Mettre l'arborescence dans un bloc de code `text`.
+- Utiliser une arborescence courte dans le README et une version plus détaillée dans `docs/`.
+
+---
+
+## 12. Tableaux
 
 ### Code Markdown
 
@@ -548,7 +816,7 @@ Python 3.12.4
 
 ---
 
-## 12. Liens
+## 13. Liens
 
 ### Lien simple
 
@@ -592,7 +860,7 @@ Python 3.12.4
 
 ---
 
-## 13. Images
+## 14. Images
 
 ### Image simple
 
@@ -633,7 +901,7 @@ docs/images/execution_script.png
 
 ---
 
-## 14. Images centrées avec HTML
+## 15. Images centrées avec HTML
 
 Markdown ne permet pas toujours de centrer précisément une image. Sur GitHub, on peut utiliser un peu de HTML.
 
@@ -677,7 +945,7 @@ Pour éviter que seule la première image soit centrée selon les plateformes, o
 
 ---
 
-## 15. Séparateurs
+## 16. Séparateurs
 
 Les séparateurs utilisent trois tirets ou plus.
 
@@ -701,7 +969,7 @@ Texte après.
 
 ---
 
-## 16. Échappement des caractères spéciaux
+## 17. Échappement des caractères spéciaux
 
 Pour afficher certains caractères Markdown sans les interpréter, utiliser `\`.
 
@@ -729,7 +997,7 @@ Pour afficher certains caractères Markdown sans les interpréter, utiliser `\`.
 
 ---
 
-## 17. Notes, avertissements et blocs d'information GitHub
+## 18. Notes, avertissements et blocs d'information GitHub
 
 GitHub permet d'afficher des blocs d'information avec une syntaxe basée sur les citations.
 
@@ -805,7 +1073,7 @@ GitHub permet d'afficher des blocs d'information avec une syntaxe basée sur les
 
 ---
 
-## 18. Sections repliables
+## 19. Sections repliables
 
 Très pratique pour masquer un bloc long.
 
@@ -841,7 +1109,7 @@ print(calculate_total([10.5, 20.0, 5.5]))
 
 ---
 
-## 19. Sommaires et ancres
+## 20. Sommaires et ancres
 
 GitHub génère automatiquement des ancres à partir des titres.
 
@@ -869,7 +1137,7 @@ Lien vers ce titre :
 
 ---
 
-## 20. Tableaux de documentation technique
+## 21. Tableaux de documentation technique
 
 ### Tableau de fichiers
 
@@ -939,7 +1207,7 @@ Lien vers ce titre :
 
 ---
 
-## 21. Documentation de fonctions Python
+## 22. Documentation de fonctions Python
 
 ### Modèle court
 
@@ -1013,7 +1281,7 @@ Bonjour Python
 
 ---
 
-## 22. Documentation de projet Python
+## 23. Documentation de projet Python
 
 ### Modèle README simple
 
@@ -1079,7 +1347,7 @@ Fabien Hummel-Knibiely
 
 ---
 
-## 23. Mermaid : diagrammes dans GitHub
+## 24. Mermaid : diagrammes dans GitHub
 
 GitHub prend en charge certains diagrammes avec des blocs de code Mermaid.
 
@@ -1141,7 +1409,7 @@ sequenceDiagram
 
 ---
 
-## 24. Expressions mathématiques
+## 25. Expressions mathématiques
 
 GitHub accepte les expressions mathématiques de type LaTeX.
 
@@ -1169,7 +1437,7 @@ $$
 
 ---
 
-## 25. HTML utilisable dans Markdown
+## 26. HTML utilisable dans Markdown
 
 GitHub accepte une partie du HTML dans les fichiers Markdown. C'est utile pour certains cas de mise en forme que Markdown ne gère pas directement.
 
@@ -1245,7 +1513,7 @@ L'image est affichée avec une largeur de 600 pixels si elle existe.
 
 ---
 
-## 26. CSS et JavaScript : limites sur GitHub
+## 27. CSS et JavaScript : limites sur GitHub
 
 Dans un fichier Markdown affiché directement sur GitHub, comme `README.md` ou un fichier dans `docs/`, il ne faut pas compter sur le CSS ou JavaScript personnalisé.
 
@@ -1278,7 +1546,7 @@ Dans un fichier Markdown affiché directement sur GitHub, comme `README.md` ou u
 
 ---
 
-## 27. Exemple GitHub Pages avec HTML, CSS et JavaScript
+## 28. Exemple GitHub Pages avec HTML, CSS et JavaScript
 
 Cet exemple est utile pour une documentation publiée comme site web, pas pour un simple rendu `README.md` dans GitHub.
 
@@ -1350,7 +1618,7 @@ Sur un site GitHub Pages, le bouton peut afficher ou masquer la section de déta
 
 ---
 
-## 28. Modèles prêts à copier
+## 29. Modèles prêts à copier
 
 ### Bloc d'installation Python
 
@@ -1459,7 +1727,7 @@ projet/
 
 ---
 
-## 29. Bonnes pratiques
+## 30. Bonnes pratiques
 
 ### Pour une documentation claire
 
@@ -1481,6 +1749,14 @@ projet/
 - Ajouter un exemple d'entrée et de sortie.
 - Ajouter une section tests.
 - Expliquer l'organisation des dossiers.
+
+### Pour les arborescences
+
+- Garder les arborescences lisibles.
+- Ne pas afficher toute l'arborescence réelle si elle est trop longue.
+- Retirer les dossiers techniques inutiles comme `.git/`, `.venv/`, `__pycache__/`.
+- Utiliser `tree -L 3` pour éviter un résultat trop profond.
+- Préférer une arborescence courte dans le README.
 
 ### À éviter
 
@@ -1505,6 +1781,8 @@ projet/
 | Barré | `~~texte~~` |
 | Code inline | `` `code` `` |
 | Bloc de code | Trois accents graves avant et après |
+| Bloc texte | Trois accents graves avec `text` |
+| Arborescence | Bloc de code `text` avec `├──`, `└──`, `│` |
 | Liste | `- élément` |
 | Liste numérotée | `1. élément` |
 | Case cochée | `- [x] tâche` |
