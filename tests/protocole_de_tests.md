@@ -515,8 +515,9 @@ Les fichiers doivent tout de même être générés :
        width="80%" />
   <br>
   <em>Exécution en mode quiet</em>
-  <br><br>
+</p>
 
+<p align="center">
   <img src="protocole_de_tests_screenshot/Screenshot_P14_2.png"
        alt="capture d'écran du terminal des fichiers générés"
        width="80%" />
